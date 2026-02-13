@@ -108,3 +108,70 @@ export function findNearestNode(x: number, y: number): GameNode | null {
   }
   return minDist <= SNAP_RADIUS ? nearest : null;
 }
+
+// Yutnori pathfinding logic
+export function getMovementPath(startNodeId: string | null, steps: number): string[] {
+  const path: string[] = [];
+  let currentId = startNodeId;
+
+  // Decide the "track" at the start of the move
+  let track: 'outer' | 'diagonal1' | 'diagonal2' | 'fromCenter' = 'outer';
+  if (currentId === 'n5') track = 'diagonal2';
+  else if (currentId === 'n10') track = 'diagonal1';
+  else if (currentId === 'n25' || currentId === 'n26') track = 'diagonal2';
+  else if (currentId === 'n23' || currentId === 'n22') track = 'diagonal1';
+  else if (currentId === 'n24') track = 'fromCenter';
+  else if (['n27', 'n28'].includes(currentId || '')) track = 'diagonal2';
+  else if (['n21', 'n20'].includes(currentId || '')) track = 'diagonal1';
+
+  // Back-do logic
+  if (steps === -1) {
+    if (!currentId) return [];
+    if (currentId === 'n0') return ['n19'];
+    const prevNodeMap: Record<string, string> = {
+      'n1': 'n0', 'n2': 'n1', 'n3': 'n2', 'n4': 'n3', 'n5': 'n4',
+      'n6': 'n5', 'n7': 'n6', 'n8': 'n7', 'n9': 'n8', 'n10': 'n9',
+      'n11': 'n10', 'n12': 'n11', 'n13': 'n12', 'n14': 'n13', 'n15': 'n14',
+      'n16': 'n15', 'n17': 'n16', 'n18': 'n17', 'n19': 'n18',
+      'n25': 'n5', 'n26': 'n25', 'n24': 'n26', 'n27': 'n24', 'n28': 'n27',
+      'n23': 'n10', 'n22': 'n23', 'n21': 'n24', 'n20': 'n21'
+    };
+    const prev = prevNodeMap[currentId];
+    return prev ? [prev] : [];
+  }
+
+  for (let i = 0; i < steps; i++) {
+    let nextId = '';
+
+    if (!currentId) {
+      nextId = 'n1';
+    } else {
+      if (track === 'outer') {
+        const num = parseInt(currentId.substring(1));
+        if (currentId.startsWith('n') && num < 19) nextId = `n${num+1}`;
+        else if (currentId === 'n19') nextId = 'n0';
+      } else if (track === 'diagonal2') {
+        // n5 -> n25 -> n26 -> n24 -> n27 -> n28 -> n15
+        const diag2 = ['n5', 'n25', 'n26', 'n24', 'n27', 'n28', 'n15', 'n16', 'n17', 'n18', 'n19', 'n0'];
+        const idx = diag2.indexOf(currentId);
+        if (idx !== -1 && idx < diag2.length - 1) nextId = diag2[idx+1];
+      } else if (track === 'diagonal1') {
+        // n10 -> n23 -> n22 -> n24 -> n21 -> n20 -> n0
+        const diag1 = ['n10', 'n23', 'n22', 'n24', 'n21', 'n20', 'n0'];
+        const idx = diag1.indexOf(currentId);
+        if (idx !== -1 && idx < diag1.length - 1) nextId = diag1[idx+1];
+      } else if (track === 'fromCenter') {
+        // Default from center is towards exit BL
+        const toExit = ['n24', 'n21', 'n20', 'n0'];
+        const idx = toExit.indexOf(currentId);
+        if (idx !== -1 && idx < toExit.length - 1) nextId = toExit[idx+1];
+      }
+    }
+
+    if (nextId) {
+      path.push(nextId);
+      currentId = nextId;
+    } else break;
+  }
+  return path;
+}

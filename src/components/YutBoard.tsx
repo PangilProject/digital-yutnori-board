@@ -1,11 +1,12 @@
 import { useState, useRef, useCallback, useMemo, useEffect } from 'react';
-import { BOARD_NODES, BOARD_EDGES, findNearestNode } from '@/data/boardNodes';
+import { BOARD_NODES, BOARD_EDGES, findNearestNode, getMovementPath } from '@/data/boardNodes';
 import { Piece, TeamConfig } from '@/types/game';
 
 interface YutBoardProps {
   pieces: Piece[];
   teams: TeamConfig[];
   onMovePiece: (pieceId: string, targetNodeId: string | null, isGoalMove?: boolean) => void;
+  currentTurn?: string;
 }
 
 interface DragState {
@@ -20,15 +21,23 @@ interface CaptureEffect {
   id: string;
 }
 
+interface AnimatingPiece {
+  id: string;
+  path: string[];
+  currentIndex: number;
+}
+
 const PIECE_RADIUS = 16;
 const HOME_Y_START = 630;
 const GOAL_ZONE = { x: 50, y: 565, w: 60, h: 40 }; // Near starting point n0
 
-const YutBoard = ({ pieces, teams, onMovePiece }: YutBoardProps) => {
+const YutBoard = ({ pieces, teams, onMovePiece, currentTurn }: YutBoardProps) => {
   const svgRef = useRef<SVGSVGElement>(null);
   const [drag, setDrag] = useState<DragState | null>(null);
   const [captureEffect, setCaptureEffect] = useState<CaptureEffect | null>(null);
   const [isShaking, setIsShaking] = useState(false);
+  const [selectedPieceId, setSelectedPieceId] = useState<string | null>(null);
+  const [animatingPiece, setAnimatingPiece] = useState<AnimatingPiece | null>(null);
   const lastCaptureRef = useRef<string | null>(null);
 
   const nodeMap = useMemo(() => {
@@ -56,12 +65,23 @@ const YutBoard = ({ pieces, teams, onMovePiece }: YutBoardProps) => {
     return groups;
   }, [pieces]);
 
-  // Effect to trigger capture animation
+  // Handle step-by-step animation
   useEffect(() => {
-    const activePiecesOnBoard = pieces.filter(p => p.nodeId && !p.isFinished);
-    // Find if any pieces were returned home while another piece moved to their node
-    // Simplified: check for changes in piece counts at nodes
-  }, [pieces]);
+    if (!animatingPiece) return;
+
+    const timer = setTimeout(() => {
+      if (animatingPiece.currentIndex < animatingPiece.path.length - 1) {
+        setAnimatingPiece(prev => prev ? { ...prev, currentIndex: prev.currentIndex + 1 } : null);
+      } else {
+        // Finalize move
+        const finalNodeId = animatingPiece.path[animatingPiece.path.length - 1];
+        onMovePiece(animatingPiece.id, finalNodeId);
+        setAnimatingPiece(null);
+      }
+    }, 250); // Speed of animation
+
+    return () => clearTimeout(timer);
+  }, [animatingPiece, onMovePiece]);
 
   // Detect capture by comparing previous pieces state
   const prevPiecesRef = useRef<Piece[]>(pieces);
@@ -108,19 +128,60 @@ const YutBoard = ({ pieces, teams, onMovePiece }: YutBoardProps) => {
   const handlePointerDown = useCallback((e: React.PointerEvent, pieceId: string) => {
     const piece = pieces.find(p => p.id === pieceId);
     if (piece?.isFinished) return;
+    if (animatingPiece) return;
+    
+    // Only allow selecting current team's pieces
+    if (currentTurn && piece?.team !== currentTurn) {
+      setSelectedPieceId(null);
+      return;
+    }
 
+    // Determine if we should drag or click
+    const startTime = Date.now();
+    
     e.preventDefault();
     e.stopPropagation();
     (e.target as Element).setPointerCapture(e.pointerId);
     const pos = clientToSVG(e.clientX, e.clientY);
     setDrag({ pieceId, currentX: pos.x, currentY: pos.y });
-  }, [clientToSVG, pieces]);
+
+    const handleUp = () => {
+      const duration = Date.now() - startTime;
+      if (duration < 200) {
+        setSelectedPieceId(prev => prev === pieceId ? null : pieceId);
+      }
+      window.removeEventListener('pointerup', handleUp);
+    };
+    window.addEventListener('pointerup', handleUp);
+  }, [clientToSVG, pieces, animatingPiece, currentTurn]);
+
+  const isStackRepresentative = (piece: Piece): boolean => {
+    if (drag?.pieceId === piece.id) return true;
+    if (animatingPiece?.id === piece.id) return true;
+    if (!piece.nodeId) return true;
+    const key = `${piece.nodeId}-${piece.team}`;
+    const group = pieceGroups.get(key);
+    return group ? group[0].id === piece.id : true;
+  };
+
+  const handleMoveOption = useCallback((steps: number) => {
+    if (!selectedPieceId) return;
+    const piece = pieces.find(p => p.id === selectedPieceId);
+    if (!piece) return;
+
+    const path = getMovementPath(piece.nodeId, steps);
+    if (path.length > 0) {
+      setAnimatingPiece({ id: selectedPieceId, path, currentIndex: 0 });
+    }
+    setSelectedPieceId(null);
+  }, [selectedPieceId, pieces]);
 
   const handlePointerMove = useCallback((e: React.PointerEvent) => {
     if (!drag) return;
     const pos = clientToSVG(e.clientX, e.clientY);
     setDrag(prev => prev ? { ...prev, currentX: pos.x, currentY: pos.y } : null);
-  }, [drag, clientToSVG]);
+    if (selectedPieceId) setSelectedPieceId(null);
+  }, [drag, clientToSVG, selectedPieceId]);
 
   const handlePointerUp = useCallback(() => {
     if (!drag) return;
@@ -153,12 +214,22 @@ const YutBoard = ({ pieces, teams, onMovePiece }: YutBoardProps) => {
   const getHomePiecePosition = (teamIndex: number, pieceIndex: number, isFinished: boolean = false): { x: number; y: number } => {
     const cols = teams.length <= 2 ? 2 : teams.length;
     const colWidth = 560 / cols;
-    const baseX = 20 + teamIndex * colWidth + 30;
+    const baseX = 20 + teamIndex * colWidth + colWidth / 2;
+    
+    // Adjust layout for 3-4 teams to prevent overlap
+    const spacing = teams.length > 2 ? 28 : 42;
+    const startX = baseX - ((Math.min(4, pieces.filter(p => !p.nodeId && !p.isFinished).length) - 1) * spacing) / 2;
+    
     const yOffset = isFinished ? 25 : 0;
-    return { x: baseX + (pieceIndex % 4) * 42, y: HOME_Y_START + 30 + yOffset };
+    return { x: startX + (pieceIndex % 4) * spacing, y: HOME_Y_START + 35 + yOffset };
   };
 
   const getPiecePosition = (piece: Piece): { x: number; y: number } => {
+    if (animatingPiece && animatingPiece.id === piece.id) {
+      const nodeId = animatingPiece.path[animatingPiece.currentIndex];
+      const node = nodeMap.get(nodeId);
+      return node ? { x: node.x, y: node.y } : { x: 0, y: 0 };
+    }
     if (drag && drag.pieceId === piece.id) {
       return { x: drag.currentX, y: drag.currentY };
     }
@@ -196,12 +267,6 @@ const YutBoard = ({ pieces, teams, onMovePiece }: YutBoardProps) => {
     return pieceGroups.get(key)?.length || 1;
   };
 
-  const isStackRepresentative = (piece: Piece): boolean => {
-    if (!piece.nodeId) return true;
-    const key = `${piece.nodeId}-${piece.team}`;
-    const group = pieceGroups.get(key);
-    return group ? group[0].id === piece.id : true;
-  };
 
   const svgHeight = 600 + 30 + 60; // board + gap + home area
 
@@ -210,6 +275,7 @@ const YutBoard = ({ pieces, teams, onMovePiece }: YutBoardProps) => {
       ref={svgRef}
       viewBox={`0 0 600 ${svgHeight}`}
       className="w-full max-w-[600px] mx-auto touch-none select-none"
+      onPointerDown={() => setSelectedPieceId(null)}
       onPointerMove={handlePointerMove}
       onPointerUp={handlePointerUp}
       onPointerCancel={handlePointerUp}
@@ -462,6 +528,63 @@ const YutBoard = ({ pieces, teams, onMovePiece }: YutBoardProps) => {
           </g>
         );
       })}
+
+      {/* Move Menu (Tooltip) */}
+      {selectedPieceId && !animatingPiece && (() => {
+        const piece = pieces.find(p => p.id === selectedPieceId);
+        if (!piece) return null;
+        const pos = getPiecePosition(piece);
+        
+        const options = [
+          { label: '도', steps: 1, color: 'hsl(200, 70%, 50%)' },
+          { label: '개', steps: 2, color: 'hsl(180, 70%, 45%)' },
+          { label: '걸', steps: 3, color: 'hsl(150, 70%, 40%)' },
+          { label: '윷', steps: 4, color: 'hsl(45, 90%, 50%)' },
+          { label: '모', steps: 5, color: 'hsl(25, 90%, 50%)' },
+          { label: '빽', steps: -1, color: 'hsl(0, 0%, 40%)' },
+        ];
+
+        return (
+          <g className="animate-in fade-in zoom-in duration-200" transform={`translate(${pos.x}, ${pos.y - 45})`}>
+            {/* Backdrop */}
+            <rect x="-105" y="-30" width="210" height="60" rx="12" fill="white" filter="url(#nodeShadow)" fillOpacity="0.9" />
+            <path d="M -8 30 L 0 38 L 8 30 Z" fill="white" fillOpacity="0.9" />
+            
+            {options.map((opt, i) => (
+              <g 
+                key={opt.label} 
+                transform={`translate(${-85 + i * 34}, 0)`} 
+                style={{ cursor: 'pointer' }}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleMoveOption(opt.steps);
+                }}
+              >
+                <circle r="14" fill={opt.color} className="hover:filter hover:brightness-110 transition-all" />
+                <text 
+                  textAnchor="middle" 
+                  dominantBaseline="central" 
+                  fontSize="12" 
+                  fontWeight="bold" 
+                  fill="white"
+                  pointerEvents="none"
+                >
+                  {opt.label}
+                </text>
+                <text
+                  y="20"
+                  textAnchor="middle"
+                  fontSize="8"
+                  fill="hsl(0, 0%, 40%)"
+                  fontWeight="bold"
+                >
+                  {opt.steps > 0 ? `+${opt.steps}` : opt.steps}
+                </text>
+              </g>
+            ))}
+          </g>
+        );
+      })()}
 
       {/* Snap preview */}
       {drag && (() => {

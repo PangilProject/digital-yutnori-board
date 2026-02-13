@@ -109,6 +109,7 @@ const GamePage = () => {
             pieces={gameState.pieces}
             teams={gameState.teams}
             onMovePiece={movePiece}
+            currentTurn={gameState.currentTurn}
           />
         </div>
 
