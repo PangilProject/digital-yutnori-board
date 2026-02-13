@@ -204,7 +204,12 @@ const YutBoard = ({ pieces, teams, onMovePiece, currentTurn }: YutBoardProps) =>
 
     const nearest = findNearestNode(drag.currentX, drag.currentY);
     if (nearest) {
-      onMovePiece(drag.pieceId, nearest.id);
+      // Special Rule: If piece is coming from home, it cannot land on 'n0' (Start)
+      if (piece?.nodeId === null && nearest.id === 'n0') {
+        onMovePiece(drag.pieceId, null);
+      } else {
+        onMovePiece(drag.pieceId, nearest.id);
+      }
     } else if (drag.currentY > 600) {
       onMovePiece(drag.pieceId, null);
     }
@@ -225,13 +230,27 @@ const YutBoard = ({ pieces, teams, onMovePiece, currentTurn }: YutBoardProps) =>
   };
 
   const getPiecePosition = (piece: Piece): { x: number; y: number } => {
-    if (animatingPiece && animatingPiece.id === piece.id) {
-      const nodeId = animatingPiece.path[animatingPiece.currentIndex];
-      const node = nodeMap.get(nodeId);
-      return node ? { x: node.x, y: node.y } : { x: 0, y: 0 };
+    // If this piece is part of a stack that is currently animating
+    if (animatingPiece) {
+      const targetPiece = pieces.find(p => p.id === animatingPiece.id);
+      if (targetPiece && piece.team === targetPiece.team && piece.nodeId === targetPiece.nodeId && !piece.isFinished) {
+        const nodeId = animatingPiece.path[animatingPiece.currentIndex];
+        const node = nodeMap.get(nodeId);
+        return node ? { x: node.x, y: node.y } : { x: 0, y: 0 };
+      }
     }
-    if (drag && drag.pieceId === piece.id) {
-      return { x: drag.currentX, y: drag.currentY };
+    
+    if (drag) {
+      const draggingPiece = pieces.find(p => p.id === drag.pieceId);
+      // If this piece is the one being dragged OR part of the same on-board stack
+      if (piece.id === drag.pieceId || (
+        draggingPiece?.nodeId && 
+        piece.nodeId === draggingPiece.nodeId && 
+        piece.team === draggingPiece.team && 
+        !piece.isFinished
+      )) {
+        return { x: drag.currentX, y: drag.currentY };
+      }
     }
     if (piece.isFinished) {
       const teamIndex = teams.findIndex(t => t.id === piece.team);
@@ -501,7 +520,7 @@ const YutBoard = ({ pieces, teams, onMovePiece, currentTurn }: YutBoardProps) =>
             />
             {/* Stack badge */}
             {count > 1 && (
-              <>
+              <g pointerEvents="none">
                 <circle
                   cx={pos.x + 13}
                   cy={pos.y - 13}
@@ -509,7 +528,6 @@ const YutBoard = ({ pieces, teams, onMovePiece, currentTurn }: YutBoardProps) =>
                   fill="hsl(45, 95%, 55%)"
                   stroke="hsl(35, 50%, 30%)"
                   strokeWidth="1.5"
-                  pointerEvents="none"
                 />
                 <text
                   x={pos.x + 13}
@@ -519,11 +537,10 @@ const YutBoard = ({ pieces, teams, onMovePiece, currentTurn }: YutBoardProps) =>
                   fontSize="10"
                   fontWeight="bold"
                   fill="hsl(35, 50%, 12%)"
-                  pointerEvents="none"
                 >
                   ×{count}
                 </text>
-              </>
+              </g>
             )}
           </g>
         );
@@ -555,6 +572,7 @@ const YutBoard = ({ pieces, teams, onMovePiece, currentTurn }: YutBoardProps) =>
                 key={opt.label} 
                 transform={`translate(${-85 + i * 34}, 0)`} 
                 style={{ cursor: 'pointer' }}
+                onPointerDown={(e) => e.stopPropagation()}
                 onClick={(e) => {
                   e.stopPropagation();
                   handleMoveOption(opt.steps);

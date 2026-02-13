@@ -82,10 +82,22 @@ export function useGameState() {
         };
       }
 
-      if (!isGoalMove && piece.nodeId === targetNodeId) return prev;
+      // Identify all pieces in the stack (same team, same node)
+      // Special: If at home (nodeId null), only move one piece at a time
+      const stackPieces = piece.nodeId === null 
+        ? [piece]
+        : prev.pieces.filter(p => 
+            p.team === piece.team && 
+            p.nodeId === piece.nodeId && 
+            !p.isFinished
+          );
+      const stackIds = stackPieces.map(p => p.id);
+      const stackCount = stackPieces.length;
 
       const team = getTeam(piece.team, prev);
-      const pieceNum = parseInt(pieceId.split('-')[1]) + 1;
+      const pieceNum = stackCount > 1 
+        ? `${stackCount}개의 말` 
+        : `${parseInt(stackIds[0].split('-')[1]) + 1}번 말`;
       
       let targetLabel = '';
       if (isGoalMove) {
@@ -97,18 +109,18 @@ export function useGameState() {
       }
 
       const logs = [...prev.logs];
-      logs.push(`${team?.emoji || ''} ${team?.name || piece.team} ${pieceNum}번 말 → ${targetLabel}`);
+      logs.push(`${team?.emoji || ''} ${team?.name || piece.team} ${pieceNum} → ${targetLabel}`);
 
       if (isGoalMove) {
         const updatedPieces = prev.pieces.map(p =>
-          p.id === pieceId ? { ...p, nodeId: null, isFinished: true } : p
+          stackIds.includes(p.id) ? { ...p, nodeId: null, isFinished: true } : p
         );
         return { ...prev, pieces: updatedPieces, logs };
       }
 
       // Capture: send opponent pieces at this node back home
       let updatedPieces = prev.pieces.map(p =>
-        p.id === pieceId ? { ...p, nodeId: targetNodeId } : p
+        stackIds.includes(p.id) ? { ...p, nodeId: targetNodeId } : p
       );
 
       if (targetNodeId) {
