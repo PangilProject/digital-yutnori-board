@@ -21,41 +21,38 @@ const GamePage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background p-2 md:p-4">
+    <div className="min-h-screen p-2 md:p-4"
+      style={{ background: 'linear-gradient(180deg, hsl(35, 45%, 90%) 0%, hsl(30, 35%, 85%) 100%)' }}>
       {/* Header */}
-      <div className="flex items-center justify-between mb-2 px-2">
-        <h1 className="text-xl md:text-2xl font-bold text-foreground">🎲 윷놀이 말판</h1>
-        <Button variant="destructive" size="sm" onClick={handleReset}>
+      <div className="flex items-center justify-between mb-3 px-2">
+        <h1 className="text-xl md:text-2xl font-extrabold text-foreground tracking-tight">🎲 윷놀이 말판</h1>
+        <Button variant="destructive" size="sm" onClick={handleReset} className="font-semibold">
           🔄 초기화
         </Button>
       </div>
 
       {/* Team info bar */}
-      <div className="flex gap-4 mb-2 px-2">
-        <div className="flex items-center gap-2">
-          <span className="w-4 h-4 rounded-full inline-block" style={{ background: 'hsl(220, 75%, 50%)' }} />
-          <span className="font-semibold text-sm text-foreground">{gameState.blueTeam.name}</span>
-        </div>
-        <div className="flex items-center gap-2">
-          <span className="w-4 h-4 rounded-full inline-block" style={{ background: 'hsl(355, 75%, 50%)' }} />
-          <span className="font-semibold text-sm text-foreground">{gameState.redTeam.name}</span>
-        </div>
+      <div className="flex flex-wrap gap-3 mb-3 px-2">
+        {gameState.teams.map(team => (
+          <div key={team.id} className="flex items-center gap-1.5 px-3 py-1 rounded-full text-sm font-semibold shadow-sm"
+            style={{ background: `${team.color}18`, border: `2px solid ${team.color}` }}>
+            <span className="w-3 h-3 rounded-full" style={{ background: team.color }} />
+            <span style={{ color: team.color }}>{team.emoji} {team.name}</span>
+          </div>
+        ))}
       </div>
 
       {/* Main layout */}
       <div className="flex flex-col lg:flex-row gap-4">
-        {/* Board */}
         <div className="flex-1 flex justify-center">
           <YutBoard
             pieces={gameState.pieces}
-            blueTeamName={gameState.blueTeam.name}
-            redTeamName={gameState.redTeam.name}
+            teams={gameState.teams}
             onMovePiece={movePiece}
           />
         </div>
 
-        {/* Log sidebar */}
-        <div className="lg:w-72 h-48 lg:h-[600px]">
+        <div className="lg:w-80 h-52 lg:h-[620px]">
           <GameLog logs={gameState.logs} />
         </div>
       </div>
