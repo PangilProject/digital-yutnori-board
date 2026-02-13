@@ -1,11 +1,10 @@
 import { useState, useRef, useCallback, useMemo } from 'react';
 import { BOARD_NODES, BOARD_EDGES, findNearestNode } from '@/data/boardNodes';
-import { Piece } from '@/types/game';
+import { Piece, TeamConfig } from '@/types/game';
 
 interface YutBoardProps {
   pieces: Piece[];
-  blueTeamName: string;
-  redTeamName: string;
+  teams: TeamConfig[];
   onMovePiece: (pieceId: string, targetNodeId: string | null) => void;
 }
 
@@ -15,18 +14,10 @@ interface DragState {
   currentY: number;
 }
 
-const PIECE_RADIUS = 18;
-const HOME_Y = 640;
+const PIECE_RADIUS = 16;
+const HOME_Y_START = 630;
 
-function getHomePiecePositions(team: 'blue' | 'red', totalPieces: number) {
-  const baseX = team === 'blue' ? 80 : 380;
-  return Array.from({ length: totalPieces }, (_, i) => ({
-    x: baseX + i * 50,
-    y: HOME_Y,
-  }));
-}
-
-const YutBoard = ({ pieces, blueTeamName, redTeamName, onMovePiece }: YutBoardProps) => {
+const YutBoard = ({ pieces, teams, onMovePiece }: YutBoardProps) => {
   const svgRef = useRef<SVGSVGElement>(null);
   const [drag, setDrag] = useState<DragState | null>(null);
 
@@ -36,7 +27,13 @@ const YutBoard = ({ pieces, blueTeamName, redTeamName, onMovePiece }: YutBoardPr
     return map;
   }, []);
 
-  // Group pieces by nodeId for stacking
+  const teamMap = useMemo(() => {
+    const map = new Map<string, TeamConfig>();
+    teams.forEach(t => map.set(t.id, t));
+    return map;
+  }, [teams]);
+
+  // Group pieces by nodeId+team for stacking
   const pieceGroups = useMemo(() => {
     const groups = new Map<string, Piece[]>();
     pieces.forEach(p => {
@@ -79,11 +76,17 @@ const YutBoard = ({ pieces, blueTeamName, redTeamName, onMovePiece }: YutBoardPr
     if (nearest) {
       onMovePiece(drag.pieceId, nearest.id);
     } else if (drag.currentY > 600) {
-      // Dropped in home zone
       onMovePiece(drag.pieceId, null);
     }
     setDrag(null);
   }, [drag, onMovePiece]);
+
+  const getHomePiecePosition = (teamIndex: number, pieceIndex: number): { x: number; y: number } => {
+    const cols = teams.length <= 2 ? 2 : teams.length;
+    const colWidth = 560 / cols;
+    const baseX = 20 + teamIndex * colWidth + 30;
+    return { x: baseX + pieceIndex * 42, y: HOME_Y_START + 30 };
+  };
 
   const getPiecePosition = (piece: Piece): { x: number; y: number } => {
     if (drag && drag.pieceId === piece.id) {
@@ -92,19 +95,23 @@ const YutBoard = ({ pieces, blueTeamName, redTeamName, onMovePiece }: YutBoardPr
     if (piece.nodeId) {
       const node = nodeMap.get(piece.nodeId);
       if (node) {
-        // Offset if stacking with different team at same node
-        const sameNodeOtherTeam = pieces.some(
-          p => p.id !== piece.id && p.nodeId === piece.nodeId && p.team !== piece.team
-        );
-        const offset = sameNodeOtherTeam ? (piece.team === 'blue' ? -12 : 12) : 0;
-        return { x: node.x + offset, y: node.y };
+        // Offset for multiple teams at the same node
+        const teamsAtNode = [...new Set(
+          pieces.filter(p => p.nodeId === piece.nodeId).map(p => p.team)
+        )];
+        if (teamsAtNode.length > 1) {
+          const teamIdx = teamsAtNode.indexOf(piece.team);
+          const angle = (teamIdx / teamsAtNode.length) * Math.PI * 2 - Math.PI / 2;
+          return { x: node.x + Math.cos(angle) * 14, y: node.y + Math.sin(angle) * 14 };
+        }
+        return { x: node.x, y: node.y };
       }
     }
     // Home position
-    const teamPieces = pieces.filter(p => p.team === piece.team);
+    const teamIndex = teams.findIndex(t => t.id === piece.team);
+    const teamPieces = pieces.filter(p => p.team === piece.team && p.nodeId === null);
     const idx = teamPieces.indexOf(piece);
-    const positions = getHomePiecePositions(piece.team, teamPieces.length);
-    return positions[idx] || { x: 300, y: HOME_Y };
+    return getHomePiecePosition(teamIndex, idx >= 0 ? idx : 0);
   };
 
   const getStackCount = (piece: Piece): number => {
@@ -120,23 +127,39 @@ const YutBoard = ({ pieces, blueTeamName, redTeamName, onMovePiece }: YutBoardPr
     return group ? group[0].id === piece.id : true;
   };
 
-  const teamColor = (team: 'blue' | 'red') =>
-    team === 'blue' ? 'hsl(220, 75%, 50%)' : 'hsl(355, 75%, 50%)';
-
-  const teamColorLight = (team: 'blue' | 'red') =>
-    team === 'blue' ? 'hsl(220, 75%, 70%)' : 'hsl(355, 75%, 70%)';
+  const svgHeight = 600 + 30 + 60; // board + gap + home area
 
   return (
     <svg
       ref={svgRef}
-      viewBox="0 0 600 700"
+      viewBox={`0 0 600 ${svgHeight}`}
       className="w-full max-w-[600px] mx-auto touch-none select-none"
       onPointerMove={handlePointerMove}
       onPointerUp={handlePointerUp}
       onPointerCancel={handlePointerUp}
     >
+      {/* Defs for gradients */}
+      <defs>
+        <radialGradient id="boardBg" cx="50%" cy="50%" r="70%">
+          <stop offset="0%" stopColor="hsl(35, 40%, 82%)" />
+          <stop offset="100%" stopColor="hsl(35, 35%, 72%)" />
+        </radialGradient>
+        <filter id="nodeShadow" x="-50%" y="-50%" width="200%" height="200%">
+          <feDropShadow dx="1" dy="1" stdDeviation="2" floodColor="rgba(0,0,0,0.2)" />
+        </filter>
+        <filter id="pieceShadow" x="-50%" y="-50%" width="200%" height="200%">
+          <feDropShadow dx="1" dy="2" stdDeviation="2" floodColor="rgba(0,0,0,0.3)" />
+        </filter>
+        <linearGradient id="boardBorder" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0%" stopColor="hsl(30, 40%, 55%)" />
+          <stop offset="100%" stopColor="hsl(30, 30%, 40%)" />
+        </linearGradient>
+      </defs>
+
       {/* Board background */}
-      <rect x="20" y="20" width="560" height="560" rx="12" fill="hsl(35, 35%, 78%)" stroke="hsl(35, 25%, 55%)" strokeWidth="3" />
+      <rect x="15" y="15" width="570" height="570" rx="16" fill="url(#boardBg)" stroke="url(#boardBorder)" strokeWidth="4" />
+      {/* Inner board decoration */}
+      <rect x="30" y="30" width="540" height="540" rx="8" fill="none" stroke="hsl(30, 25%, 62%)" strokeWidth="1" strokeDasharray="8 4" />
 
       {/* Edges */}
       {BOARD_EDGES.map((edge, i) => {
@@ -148,7 +171,7 @@ const YutBoard = ({ pieces, blueTeamName, redTeamName, onMovePiece }: YutBoardPr
             key={i}
             x1={from.x} y1={from.y}
             x2={to.x} y2={to.y}
-            stroke="hsl(35, 20%, 55%)"
+            stroke="hsl(30, 22%, 52%)"
             strokeWidth="2.5"
             strokeLinecap="round"
           />
@@ -156,39 +179,66 @@ const YutBoard = ({ pieces, blueTeamName, redTeamName, onMovePiece }: YutBoardPr
       })}
 
       {/* Nodes */}
-      {BOARD_NODES.map(node => (
-        <g key={node.id}>
-          <circle
-            cx={node.x}
-            cy={node.y}
-            r={node.isCorner || node.isCenter ? 20 : 14}
-            fill={node.isCorner || node.isCenter ? 'hsl(35, 30%, 50%)' : 'hsl(35, 25%, 62%)'}
-            stroke="hsl(35, 20%, 40%)"
-            strokeWidth="2"
-          />
-          {node.label && (
-            <text
-              x={node.x}
-              y={node.y + 1}
-              textAnchor="middle"
-              dominantBaseline="central"
-              fontSize="10"
-              fontWeight="bold"
-              fill="hsl(35, 10%, 95%)"
-              pointerEvents="none"
-            >
-              {node.label}
-            </text>
-          )}
-        </g>
-      ))}
+      {BOARD_NODES.map(node => {
+        const r = node.isCorner ? 22 : node.isCenter ? 20 : 13;
+        return (
+          <g key={node.id} filter="url(#nodeShadow)">
+            <circle
+              cx={node.x}
+              cy={node.y}
+              r={r}
+              fill={
+                node.isCorner
+                  ? 'hsl(30, 35%, 48%)'
+                  : node.isCenter
+                  ? 'hsl(25, 40%, 45%)'
+                  : 'hsl(32, 28%, 60%)'
+              }
+              stroke="hsl(28, 25%, 38%)"
+              strokeWidth="2"
+            />
+            {(node.isCorner || node.isCenter) && (
+              <circle
+                cx={node.x}
+                cy={node.y}
+                r={r - 5}
+                fill="none"
+                stroke="hsl(35, 30%, 65%)"
+                strokeWidth="1"
+              />
+            )}
+            {node.label && (
+              <text
+                x={node.x}
+                y={node.y + 1}
+                textAnchor="middle"
+                dominantBaseline="central"
+                fontSize={node.isCorner ? 11 : 10}
+                fontWeight="bold"
+                fill="hsl(40, 20%, 92%)"
+                pointerEvents="none"
+              >
+                {node.label}
+              </text>
+            )}
+          </g>
+        );
+      })}
 
-      {/* Home zone divider */}
-      <line x1="30" y1="610" x2="570" y2="610" stroke="hsl(35, 20%, 70%)" strokeWidth="1" strokeDasharray="6 4" />
+      {/* Home zone */}
+      <rect x="15" y="608" width="570" height="76" rx="10" fill="hsl(35, 30%, 88%)" stroke="hsl(35, 20%, 75%)" strokeWidth="1.5" />
 
       {/* Home labels */}
-      <text x="80" y="625" fontSize="12" fontWeight="bold" fill={teamColor('blue')}>{blueTeamName}</text>
-      <text x="380" y="625" fontSize="12" fontWeight="bold" fill={teamColor('red')}>{redTeamName}</text>
+      {teams.map((team, i) => {
+        const cols = teams.length <= 2 ? 2 : teams.length;
+        const colWidth = 560 / cols;
+        const baseX = 20 + i * colWidth + 10;
+        return (
+          <text key={team.id} x={baseX} y={HOME_Y_START + 8} fontSize="11" fontWeight="bold" fill={team.color}>
+            {team.emoji} {team.name}
+          </text>
+        );
+      })}
 
       {/* Pieces */}
       {pieces.map(piece => {
@@ -196,57 +246,61 @@ const YutBoard = ({ pieces, blueTeamName, redTeamName, onMovePiece }: YutBoardPr
         const pos = getPiecePosition(piece);
         const count = drag?.pieceId === piece.id ? 1 : getStackCount(piece);
         const isDragging = drag?.pieceId === piece.id;
+        const team = teamMap.get(piece.team);
+        if (!team) return null;
 
         return (
           <g
             key={piece.id}
-            style={{ cursor: 'grab', opacity: isDragging ? 0.8 : 1 }}
+            style={{ cursor: 'grab', opacity: isDragging ? 0.85 : 1 }}
+            filter={isDragging ? undefined : 'url(#pieceShadow)'}
             onPointerDown={(e) => handlePointerDown(e, piece.id)}
           >
-            {/* Shadow */}
-            <circle
-              cx={pos.x + 2}
-              cy={pos.y + 2}
-              r={PIECE_RADIUS}
-              fill="rgba(0,0,0,0.15)"
-            />
             {/* Piece body */}
             <circle
               cx={pos.x}
               cy={pos.y}
               r={PIECE_RADIUS}
-              fill={teamColor(piece.team)}
-              stroke={isDragging ? 'hsl(45, 100%, 60%)' : teamColorLight(piece.team)}
+              fill={team.color}
+              stroke={isDragging ? 'hsl(45, 100%, 60%)' : team.colorLight}
               strokeWidth={isDragging ? 3 : 2}
             />
-            {/* Piece inner */}
+            {/* Piece inner ring */}
             <circle
               cx={pos.x}
               cy={pos.y}
-              r={10}
-              fill={teamColorLight(piece.team)}
+              r={9}
+              fill={team.colorLight}
+              pointerEvents="none"
+            />
+            {/* Piece shine */}
+            <circle
+              cx={pos.x - 4}
+              cy={pos.y - 5}
+              r={4}
+              fill="rgba(255,255,255,0.35)"
               pointerEvents="none"
             />
             {/* Stack badge */}
             {count > 1 && (
               <>
                 <circle
-                  cx={pos.x + 14}
-                  cy={pos.y - 14}
-                  r={10}
-                  fill="hsl(45, 90%, 55%)"
-                  stroke="hsl(35, 40%, 30%)"
+                  cx={pos.x + 13}
+                  cy={pos.y - 13}
+                  r={9}
+                  fill="hsl(45, 95%, 55%)"
+                  stroke="hsl(35, 50%, 30%)"
                   strokeWidth="1.5"
                   pointerEvents="none"
                 />
                 <text
-                  x={pos.x + 14}
-                  y={pos.y - 13}
+                  x={pos.x + 13}
+                  y={pos.y - 12}
                   textAnchor="middle"
                   dominantBaseline="central"
-                  fontSize="11"
+                  fontSize="10"
                   fontWeight="bold"
-                  fill="hsl(35, 40%, 15%)"
+                  fill="hsl(35, 50%, 12%)"
                   pointerEvents="none"
                 >
                   ×{count}
@@ -267,11 +321,13 @@ const YutBoard = ({ pieces, blueTeamName, redTeamName, onMovePiece }: YutBoardPr
             cy={nearest.y}
             r={22}
             fill="none"
-            stroke="hsl(45, 100%, 60%)"
-            strokeWidth="2"
-            strokeDasharray="4 4"
+            stroke="hsl(45, 100%, 55%)"
+            strokeWidth="2.5"
+            strokeDasharray="5 4"
             pointerEvents="none"
-          />
+          >
+            <animate attributeName="stroke-dashoffset" from="0" to="18" dur="0.8s" repeatCount="indefinite" />
+          </circle>
         );
       })()}
     </svg>

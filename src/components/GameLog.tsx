@@ -14,12 +14,15 @@ const GameLog = ({ logs }: GameLogProps) => {
 
   return (
     <div className="flex flex-col h-full">
-      <h3 className="text-lg font-bold mb-2 text-foreground">📜 게임 로그</h3>
-      <ScrollArea className="flex-1 border border-border rounded-md bg-card p-3">
-        <div className="space-y-1">
+      <h3 className="text-lg font-bold mb-2 text-foreground flex items-center gap-2">
+        📜 <span>게임 로그</span>
+        <span className="text-xs font-normal text-muted-foreground">({logs.length})</span>
+      </h3>
+      <ScrollArea className="flex-1 border border-border rounded-xl bg-card/80 backdrop-blur-sm p-3 shadow-inner">
+        <div className="space-y-1.5">
           {logs.map((log, i) => (
-            <p key={i} className="text-sm text-card-foreground">
-              <span className="text-muted-foreground mr-2 text-xs">{i + 1}.</span>
+            <p key={i} className={`text-sm ${log.includes('💥') ? 'font-bold text-destructive' : 'text-card-foreground'}`}>
+              <span className="text-muted-foreground mr-1.5 text-xs font-mono">{String(i + 1).padStart(2, '0')}</span>
               {log}
             </p>
           ))}
