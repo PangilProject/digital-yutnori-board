@@ -37,6 +37,7 @@ export function initializeGame(teams: TeamConfig[]): GameState {
     teams,
     pieces: createInitialPieces(teams),
     logs: [`🎮 게임 시작! ${teamNames}`],
+    currentTurn: teams[0].id,
   };
   saveState(state);
   return state;
@@ -53,21 +54,57 @@ export function useGameState() {
     return state.teams.find(t => t.id === teamId);
   }, []);
 
-  const movePiece = useCallback((pieceId: string, targetNodeId: string | null) => {
+  const nextTurn = useCallback(() => {
+    setGameState(prev => {
+      if (!prev) return prev;
+      const currentIndex = prev.teams.findIndex(t => t.id === prev.currentTurn);
+      const nextIndex = (currentIndex + 1) % prev.teams.length;
+      const nextTeam = prev.teams[nextIndex];
+      return {
+        ...prev,
+        currentTurn: nextTeam.id,
+        logs: [...prev.logs, `👋 ${nextTeam.emoji} ${nextTeam.name}의 차례입니다.`],
+      };
+    });
+  }, []);
+
+  const movePiece = useCallback((pieceId: string, targetNodeId: string | null, isGoalMove: boolean = false) => {
     setGameState(prev => {
       if (!prev) return prev;
       const piece = prev.pieces.find(p => p.id === pieceId);
       if (!piece) return prev;
-      if (piece.nodeId === targetNodeId) return prev;
+      
+      // Block moves if it's not the team's turn
+      if (piece.team !== prev.currentTurn) {
+        return {
+          ...prev,
+          logs: [...prev.logs, `⚠️ 현재는 ${prev.teams.find(t => t.id === prev.currentTurn)?.name}의 차례입니다!`],
+        };
+      }
+
+      if (!isGoalMove && piece.nodeId === targetNodeId) return prev;
 
       const team = getTeam(piece.team, prev);
       const pieceNum = parseInt(pieceId.split('-')[1]) + 1;
-      const targetLabel = targetNodeId
-        ? (getNodeById(targetNodeId)?.label || targetNodeId)
-        : '대기석';
+      
+      let targetLabel = '';
+      if (isGoalMove) {
+        targetLabel = '🏁 골인!';
+      } else {
+        targetLabel = targetNodeId
+          ? (getNodeById(targetNodeId)?.label || targetNodeId)
+          : '대기석';
+      }
 
       const logs = [...prev.logs];
       logs.push(`${team?.emoji || ''} ${team?.name || piece.team} ${pieceNum}번 말 → ${targetLabel}`);
+
+      if (isGoalMove) {
+        const updatedPieces = prev.pieces.map(p =>
+          p.id === pieceId ? { ...p, nodeId: null, isFinished: true } : p
+        );
+        return { ...prev, pieces: updatedPieces, logs };
+      }
 
       // Capture: send opponent pieces at this node back home
       let updatedPieces = prev.pieces.map(p =>
@@ -76,7 +113,7 @@ export function useGameState() {
 
       if (targetNodeId) {
         const capturedPieces = updatedPieces.filter(
-          p => p.nodeId === targetNodeId && p.team !== piece.team
+          p => p.nodeId === targetNodeId && p.team !== piece.team && !p.isFinished
         );
         if (capturedPieces.length > 0) {
           const capturedTeams = new Set(capturedPieces.map(p => p.team));
@@ -100,5 +137,5 @@ export function useGameState() {
     setGameState(null);
   }, []);
 
-  return { gameState, setGameState, movePiece, resetGame };
+  return { gameState, setGameState, movePiece, nextTurn, resetGame };
 }

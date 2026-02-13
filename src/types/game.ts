@@ -18,6 +18,7 @@ export interface Piece {
   id: string;
   team: TeamId;
   nodeId: string | null; // null = home (off-board)
+  isFinished?: boolean;
 }
 
 export interface TeamConfig {
@@ -33,6 +34,7 @@ export interface GameState {
   teams: TeamConfig[];
   pieces: Piece[];
   logs: string[];
+  currentTurn: TeamId;
 }
 
 export const TEAM_PRESETS: { color: string; colorLight: string; emoji: string; defaultName: string }[] = [

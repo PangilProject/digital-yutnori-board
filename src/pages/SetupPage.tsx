@@ -72,49 +72,51 @@ const SetupPage = () => {
           </div>
 
           {/* Team configs */}
-          {Array.from({ length: teamCount }, (_, i) => {
-            const preset = TEAM_PRESETS[i];
-            return (
-              <div
-                key={i}
-                className="p-4 rounded-xl border-2 transition-all"
-                style={{
-                  borderColor: preset.color,
-                  background: `linear-gradient(135deg, ${preset.colorLight}15, transparent)`,
-                }}
-              >
-                <h3 className="font-bold text-base mb-3 flex items-center gap-2" style={{ color: preset.color }}>
-                  <span className="text-xl">{preset.emoji}</span>
-                  {preset.defaultName}
-                </h3>
-                <div className="space-y-2">
-                  <div>
-                    <Label className="text-xs text-muted-foreground">팀 이름 (비우면 랜덤)</Label>
-                    <Input
-                      value={teamSetups[i].name}
-                      onChange={e => updateTeam(i, 'name', e.target.value)}
-                      placeholder={`예: ${preset.defaultName}`}
-                      className="mt-1 h-9"
-                    />
-                  </div>
-                  <div>
-                    <Label className="text-xs text-muted-foreground">
-                      말 개수: <span className="font-bold text-foreground">{teamSetups[i].pieceCount}개</span>
-                    </Label>
-                    <input
-                      type="range"
-                      min={1}
-                      max={5}
-                      value={teamSetups[i].pieceCount}
-                      onChange={e => updateTeam(i, 'pieceCount', Number(e.target.value))}
-                      className="w-full mt-1 accent-current"
-                      style={{ accentColor: preset.color }}
-                    />
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            {Array.from({ length: teamCount }, (_, i) => {
+              const preset = TEAM_PRESETS[i];
+              return (
+                <div
+                  key={i}
+                  className="p-3 rounded-xl border-2 transition-all flex flex-col justify-between"
+                  style={{
+                    borderColor: preset.color,
+                    background: `linear-gradient(135deg, ${preset.colorLight}15, transparent)`,
+                  }}
+                >
+                  <h3 className="font-bold text-sm mb-2 flex items-center gap-2" style={{ color: preset.color }}>
+                    <span className="text-lg">{preset.emoji}</span>
+                    {preset.defaultName}
+                  </h3>
+                  <div className="space-y-2">
+                    <div>
+                      <Label className="text-[10px] text-muted-foreground uppercase font-bold tracking-wider">팀 이름</Label>
+                      <Input
+                        value={teamSetups[i].name}
+                        onChange={e => updateTeam(i, 'name', e.target.value)}
+                        placeholder={`${preset.defaultName}`}
+                        className="mt-0.5 h-8 text-sm"
+                      />
+                    </div>
+                    <div>
+                      <Label className="text-[10px] text-muted-foreground uppercase font-bold tracking-wider">
+                        말 개수: <span className="font-bold text-foreground">{teamSetups[i].pieceCount}개</span>
+                      </Label>
+                      <input
+                        type="range"
+                        min={1}
+                        max={5}
+                        value={teamSetups[i].pieceCount}
+                        onChange={e => updateTeam(i, 'pieceCount', Number(e.target.value))}
+                        className="w-full mt-0.5 accent-current"
+                        style={{ accentColor: preset.color }}
+                      />
+                    </div>
                   </div>
                 </div>
-              </div>
-            );
-          })}
+              );
+            })}
+          </div>
 
           <Button onClick={handleStart} className="w-full text-lg h-12 font-bold" size="lg">
             🎮 게임 시작!
