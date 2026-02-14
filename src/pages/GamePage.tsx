@@ -22,6 +22,7 @@ const GamePage = () => {
     (pieceId, targetNodeId, isGoalMove) => {
       movePiece(pieceId, targetNodeId, isGoalMove);
       completeStep('game_move_piece');
+      boardLogic.setters.setSelectedPieceId(null);
     },
     gameState?.currentTurn
   );
@@ -83,6 +84,7 @@ const GamePage = () => {
                 onMovePiece={(pieceId, targetNodeId, isGoalMove) => {
                   movePiece(pieceId, targetNodeId, isGoalMove);
                   completeStep('game_move_piece');
+                  boardLogic.setters.setSelectedPieceId(null);
                 }}
                 currentTurn={gameState.currentTurn}
                 logic={boardLogic}
@@ -137,7 +139,9 @@ const GamePage = () => {
                   pieces={gameState.pieces}
                   isCurrentTurn={gameState.currentTurn === team.id}
                   onNextTurn={gameState.currentTurn === team.id ? handleNextTurn : undefined}
-                  onSelectPiece={(pieceId) => boardLogic.setters.setSelectedPieceId(pieceId)}
+                  onSelectPiece={(pieceId) => 
+                    boardLogic.setters.setSelectedPieceId(prev => prev === pieceId ? null : pieceId)
+                  }
                   selectedPieceId={boardLogic.states.selectedPieceId}
                   onMoveOption={(pieceId, steps) => {
                     const piece = gameState.pieces.find(p => p.id === pieceId);
@@ -147,8 +151,8 @@ const GamePage = () => {
                         path: boardLogic.helpers.getMovementPath(piece.nodeId, steps),
                         currentIndex: 0
                       });
-                      boardLogic.setters.setSelectedPieceId(null);
                     }
+                    boardLogic.setters.setSelectedPieceId(null);
                   }}
                 />
                 <OnboardingTooltip 

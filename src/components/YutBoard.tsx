@@ -169,11 +169,14 @@ const YutBoard = ({ pieces, teams, onMovePiece, currentTurn, logic }: YutBoardPr
           return piece ? (
             <MoveMenu 
               pos={getPiecePosition(piece)} 
-              onMoveOption={(steps) => setters.setAnimatingPiece({ 
-                id: selectedPieceId, 
-                path: getMovementPath(piece.nodeId, steps), 
-                currentIndex: 0 
-              })} 
+              onMoveOption={(steps) => {
+                setters.setAnimatingPiece({ 
+                  id: selectedPieceId, 
+                  path: getMovementPath(piece.nodeId, steps), 
+                  currentIndex: 0 
+                });
+                setSelectedPieceId(null);
+              }} 
             />
           ) : null;
         })()}
