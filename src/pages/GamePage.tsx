@@ -91,27 +91,14 @@ const GamePage = () => {
               />
               
               {/* Board Overlays / Tooltips */}
-              <div className="absolute top-10 left-1/2 -translate-x-1/2 w-1 h-1">
+              <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-1 h-1">
                 <OnboardingTooltip 
                   isVisible={isVisible}
                   step={currentStep}
                   targetStep="game_start"
                   title="게임 시작!"
-                  content="이제 본격적으로 게임을 시작합니다. 현재 턴인 팀의 말을 움직여보세요."
+                  content="이제 본격적으로 게임을 시작합니다. 우측 대시보드에서 말을 선택하여 보드판으로 진출시켜보세요."
                   onNext={() => completeStep('game_start')}
-                  onSkip={skipOnboarding}
-                  position="top"
-                />
-              </div>
-
-              <div className="absolute bottom-32 left-1/2 -translate-x-1/2 w-1 h-1">
-                <OnboardingTooltip 
-                  isVisible={isVisible}
-                  step={currentStep}
-                  targetStep="game_move_piece"
-                  title="말 선택 및 이동"
-                  content="우측 팀 대시보드에서 '안 나온 말' 아이콘을 클릭해보세요. 보드판 하단에 나타난 이동 메뉴를 통해 게임을 시작할 수 있습니다."
-                  onNext={() => completeStep('game_move_piece')}
                   onSkip={skipOnboarding}
                   position="top"
                 />
@@ -155,6 +142,21 @@ const GamePage = () => {
                     boardLogic.setters.setSelectedPieceId(null);
                   }}
                 />
+                
+                {/* Move Piece Tooltip - Points to the Dashboard */}
+                <div className="absolute top-1/2 right-[calc(100%+20px)] w-0 h-0">
+                  <OnboardingTooltip 
+                    isVisible={isVisible && gameState.currentTurn === team.id}
+                    step={currentStep}
+                    targetStep="game_move_piece"
+                    title="말 선택 및 이동"
+                    content="'안 나온 말' 아이콘을 클릭하여 이동 메뉴를 열어보세요. 대시보드에서 바로 조작할 수 있습니다."
+                    onNext={() => completeStep('game_move_piece')}
+                    onSkip={skipOnboarding}
+                    position="left"
+                  />
+                </div>
+
                 <OnboardingTooltip 
                   isVisible={isVisible && gameState.currentTurn === team.id}
                   step={currentStep}
