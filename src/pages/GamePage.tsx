@@ -2,12 +2,10 @@ import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import YutBoard from '@/components/YutBoard';
-import GameLog from '@/components/GameLog';
 import GameResult from '@/components/board/GameResult';
 import { useGameState } from '@/hooks/useGameState';
-
 import { HelpModal } from '@/components/board/HelpModal';
-
+import { TeamDashboard } from '@/components/board/TeamDashboard';
 import { useOnboarding } from '@/hooks/useOnboarding';
 import { OnboardingTooltip } from '@/components/board/OnboardingTooltip';
 
@@ -36,154 +34,137 @@ const GamePage = () => {
     navigate('/', { replace: true });
   };
 
-  const getFinishedCount = (teamId: string) => {
-    return gameState.pieces.filter(p => p.team === teamId && p.isFinished).length;
-  };
-
-  const getTotalPieces = (teamId: string) => {
-    return gameState.teams.find(t => t.id === teamId)?.pieceCount || 0;
-  };
-
   const handleNextTurn = () => {
     nextTurn();
     completeStep('game_next_turn');
   };
 
+  // 팀을 좌우로 나누기 (PC 레이아웃용)
+  const leftTeams = gameState.teams.filter((_, i) => i % 2 === 0);
+  const rightTeams = gameState.teams.filter((_, i) => i % 2 !== 0);
+
   return (
-    <div className="min-h-screen p-2 md:p-4"
-      style={{ background: 'linear-gradient(180deg, hsl(35, 45%, 90%) 0%, hsl(30, 35%, 85%) 100%)' }}>
+    <div className="min-h-screen p-3 md:p-6 lg:p-10"
+      style={{ background: 'linear-gradient(180deg, hsl(35, 45%, 94%) 0%, hsl(30, 35%, 88%) 100%)' }}>
+      
       {/* Header */}
-      <div className="flex items-center justify-between mb-3 px-2">
-        <h1 className="text-xl md:text-2xl font-extrabold text-foreground tracking-tight">🎲 윷놀이 말판</h1>
-        <div className="flex items-center gap-2">
+      <div className="max-w-[1600px] mx-auto flex items-center justify-between mb-6 px-2">
+        <div className="flex items-center gap-3">
+          <h1 className="text-2xl md:text-3xl font-black text-foreground tracking-tighter flex items-center gap-2">
+            <span className="text-4xl">🎲</span> 윷놀이 디지털 말판
+          </h1>
+        </div>
+        <div className="flex items-center gap-3">
           <HelpModal />
-          <Button variant="destructive" size="sm" onClick={handleReset} className="font-semibold px-4">
-            🔄 초기화
+          <Button variant="destructive" size="default" onClick={handleReset} className="font-bold px-6 shadow-lg shadow-destructive/20 border-2 border-destructive/10">
+            🔄 게임 초기화
           </Button>
         </div>
       </div>
 
-      {/* Team info bar - Responsive Grid */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-3 px-2">
-        {gameState.teams.map(team => {
-          const isCurrentTurn = gameState.currentTurn === team.id;
-          const finished = getFinishedCount(team.id);
-          const total = getTotalPieces(team.id);
+      <div className="max-w-[1600px] mx-auto">
+        {/* Main Grid Layout */}
+        <div className="grid grid-cols-1 lg:grid-cols-[320px_1fr_320px] gap-8 items-start">
           
-          return (
-            <div 
-              key={team.id} 
-              className={`relative flex flex-col gap-1 p-3 rounded-xl transition-all duration-300 ${isCurrentTurn ? 'ring-4 ring-offset-2 scale-105 z-10' : 'opacity-80'}`}
-              style={{ 
-                background: `white`, 
-                border: `3px solid ${team.color}`,
-                borderColor: isCurrentTurn ? team.color : `${team.color}40`,
-                boxShadow: isCurrentTurn ? `0 0 20px ${team.color}40` : 'none'
-              }}
-            >
-              {isCurrentTurn && (
-                <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-foreground text-background px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider">
-                  Current Turn
-                </div>
-              )}
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-1.5 font-bold truncate">
-                  <span className="text-lg">{team.emoji}</span>
-                  <span style={{ color: team.color }} className="truncate">{team.name}</span>
-                </div>
-                <div className="text-xs font-bold px-2 py-1 rounded-md bg-muted">
-                  {finished}/{total}
-                </div>
+          {/* Left Side: Teams 0, 2 */}
+          <div className="flex flex-col gap-6 order-2 lg:order-1">
+            {leftTeams.map(team => (
+              <div key={team.id} className="relative">
+                <TeamDashboard 
+                  team={team}
+                  pieces={gameState.pieces}
+                  isCurrentTurn={gameState.currentTurn === team.id}
+                  onNextTurn={gameState.currentTurn === team.id ? handleNextTurn : undefined}
+                />
+                <OnboardingTooltip 
+                  isVisible={isVisible && gameState.currentTurn === team.id}
+                  step={currentStep}
+                  targetStep="game_next_turn"
+                  title="턴 넘기기"
+                  content="말을 모두 이동시켰다면 팀보드 하단 버튼을 눌러 상대 팀에게 기회를 넘겨주세요."
+                  onNext={() => completeStep('game_next_turn')}
+                  onSkip={skipOnboarding}
+                  position="top"
+                />
               </div>
+            ))}
+          </div>
+
+          {/* Center: Yut Board */}
+          <div className="relative flex-1 flex flex-col items-center order-1 lg:order-2">
+            <div className="relative w-full max-w-[650px] bg-white/50 p-4 md:p-8 rounded-[2rem] shadow-inner-lg border-2 border-white/20">
+              <YutBoard
+                pieces={gameState.pieces}
+                teams={gameState.teams}
+                onMovePiece={(pieceId, targetNodeId, isGoalMove) => {
+                  movePiece(pieceId, targetNodeId, isGoalMove);
+                  completeStep('game_move_piece');
+                }}
+                currentTurn={gameState.currentTurn}
+              />
               
-              {/* Progress bar */}
-              <div className="w-full h-2 bg-muted rounded-full overflow-hidden mt-1">
-                <div 
-                  className="h-full transition-all duration-500"
-                  style={{ 
-                    width: `${(finished / total) * 100}%`,
-                    backgroundColor: team.color 
-                  }}
+              {/* Board Overlays / Tooltips */}
+              <div className="absolute top-10 left-1/2 -translate-x-1/2 w-1 h-1">
+                <OnboardingTooltip 
+                  isVisible={isVisible}
+                  step={currentStep}
+                  targetStep="game_start"
+                  title="게임 시작!"
+                  content="이제 본격적으로 게임을 시작합니다. 현재 턴인 팀의 말을 움직여보세요."
+                  onNext={() => completeStep('game_start')}
+                  onSkip={skipOnboarding}
+                  position="top"
+                />
+              </div>
+
+              <div className="absolute bottom-32 left-1/2 -translate-x-1/2 w-1 h-1">
+                <OnboardingTooltip 
+                  isVisible={isVisible}
+                  step={currentStep}
+                  targetStep="game_move_piece"
+                  title="말 이동 가이드"
+                  content="하단 대기석의 말을 보드 위로 드래그하여 이동시켜보세요. 또는 말을 클릭하여 상세 메뉴를 열 수도 있습니다."
+                  onNext={() => completeStep('game_move_piece')}
+                  onSkip={skipOnboarding}
+                  position="top"
                 />
               </div>
             </div>
-          );
-        })}
-      </div>
-
-      {/* Primary Turn Control */}
-      <div className="relative flex justify-center mb-4 px-2">
-        <Button 
-          size="lg" 
-          onClick={handleNextTurn} 
-          className="w-full md:w-auto md:min-w-[300px] h-14 text-lg font-black shadow-xl transition-all duration-300 transform hover:scale-105 active:scale-95"
-          style={{
-            background: gameState.teams.find(t => t.id === gameState.currentTurn)?.color || 'black',
-            boxShadow: `0 8px 30px ${gameState.teams.find(t => t.id === gameState.currentTurn)?.color}60`
-          }}
-        >
-          ⏭️ {gameState.teams.find(t => t.id === gameState.currentTurn)?.name} 턴 넘기기
-        </Button>
-        <OnboardingTooltip 
-          isVisible={isVisible}
-          step={currentStep}
-          targetStep="game_next_turn"
-          title="턴 넘기기"
-          content="말을 모두 이동시켰다면 버튼을 눌러 상대 팀에게 기회를 넘겨주세요."
-          onNext={() => completeStep('game_next_turn')}
-          onSkip={skipOnboarding}
-          position="top"
-        />
-      </div>
-
-      {/* Main layout */}
-      <div className="flex flex-col lg:flex-row gap-4">
-        <div className="relative flex-1 flex justify-center">
-          <YutBoard
-            pieces={gameState.pieces}
-            teams={gameState.teams}
-            onMovePiece={(pieceId, targetNodeId, isGoalMove) => {
-              movePiece(pieceId, targetNodeId, isGoalMove);
-              completeStep('game_move_piece');
-            }}
-            currentTurn={gameState.currentTurn}
-          />
-          
-          {/* 보드 위쪽 가이드 (게임 시작) */}
-          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-1 h-1">
-            <OnboardingTooltip 
-              isVisible={isVisible}
-              step={currentStep}
-              targetStep="game_start"
-              title="게임판 시작"
-              content="이제 본격적으로 게임을 시작합니다! 현재 턴인 팀의 말을 움직여보세요."
-              onNext={() => completeStep('game_start')}
-              onSkip={skipOnboarding}
-              position="top"
-            />
+            
+            {/* Legend or subtle info */}
+            <p className="mt-6 text-xs font-bold text-muted-foreground uppercase tracking-widest opacity-50">
+              Traditional Digital Experience • Digital Yutnori
+            </p>
           </div>
 
-          {/* 보드 아래쪽 가이드 (말 이동) - 대기석 근처에 배치 */}
-          <div className="absolute bottom-20 left-1/2 -translate-x-1/2 w-1 h-1">
-            <OnboardingTooltip 
-              isVisible={isVisible}
-              step={currentStep}
-              targetStep="game_move_piece"
-              title="말 이동하기"
-              content="하단 대기석에 있는 말을 보드 위로 드래그하여 이동시켜보세요. 또는 말을 클릭하여 메뉴를 열 수도 있습니다."
-              onNext={() => completeStep('game_move_piece')}
-              onSkip={skipOnboarding}
-              position="top"
-            />
+          {/* Right Side: Teams 1, 3 */}
+          <div className="flex flex-col gap-6 order-3">
+            {rightTeams.map(team => (
+              <div key={team.id} className="relative">
+                <TeamDashboard 
+                  team={team}
+                  pieces={gameState.pieces}
+                  isCurrentTurn={gameState.currentTurn === team.id}
+                  onNextTurn={gameState.currentTurn === team.id ? handleNextTurn : undefined}
+                />
+                <OnboardingTooltip 
+                  isVisible={isVisible && gameState.currentTurn === team.id}
+                  step={currentStep}
+                  targetStep="game_next_turn"
+                  title="턴 넘기기"
+                  content="말을 모두 이동시켰다면 팀보드 하단 버튼을 눌러 상대 팀에게 기회를 넘겨주세요."
+                  onNext={() => completeStep('game_next_turn')}
+                  onSkip={skipOnboarding}
+                  position="top"
+                />
+              </div>
+            ))}
           </div>
-        </div>
 
-        <div className="lg:w-80 h-52 lg:h-[620px]">
-          <GameLog logs={gameState.logs} />
         </div>
       </div>
 
-      {/* 결과 화면 오버레이 */}
+      {/* Result Overlay */}
       {gameState.winnerId && (
         <GameResult 
           gameState={gameState} 
