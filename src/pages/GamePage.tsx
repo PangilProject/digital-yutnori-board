@@ -3,11 +3,12 @@ import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import YutBoard from '@/components/YutBoard';
 import GameLog from '@/components/GameLog';
+import GameResult from '@/components/board/GameResult';
 import { useGameState } from '@/hooks/useGameState';
 
 const GamePage = () => {
   const navigate = useNavigate();
-  const { gameState, movePiece, nextTurn, resetGame } = useGameState();
+  const { gameState, movePiece, nextTurn, resetGame, restartGame } = useGameState();
 
   useEffect(() => {
     if (!gameState) navigate('/', { replace: true });
@@ -16,6 +17,15 @@ const GamePage = () => {
   if (!gameState) return null;
 
   const handleReset = () => {
+    resetGame();
+    navigate('/', { replace: true });
+  };
+
+  const handleRestart = () => {
+    restartGame();
+  };
+
+  const handleHome = () => {
     resetGame();
     navigate('/', { replace: true });
   };
@@ -117,6 +127,15 @@ const GamePage = () => {
           <GameLog logs={gameState.logs} />
         </div>
       </div>
+
+      {/* 결과 화면 오버레이 */}
+      {gameState.winnerId && (
+        <GameResult 
+          gameState={gameState} 
+          onRestart={handleRestart} 
+          onHome={handleHome} 
+        />
+      )}
     </div>
   );
 };

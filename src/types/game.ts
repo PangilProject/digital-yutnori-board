@@ -30,11 +30,26 @@ export interface TeamConfig {
   emoji: string;
 }
 
+export interface TeamStats {
+  /** 총 이동 횟수 */
+  moveCount: number;
+  /** 상대방 말을 잡은 횟수 */
+  captureCount: number;
+  /** 우리 팀 말을 업은 횟수 */
+  stackCount: number;
+  /** 골인한 말의 개수 */
+  finishedCount: number;
+}
+
 export interface GameState {
   teams: TeamConfig[];
   pieces: Piece[];
   logs: string[];
   currentTurn: TeamId;
+  /** 승리한 팀의 ID (게임 종료 시 설정) */
+  winnerId?: TeamId | null;
+  /** 팀별 게임 통계 데이터 */
+  stats?: Record<TeamId, TeamStats>;
 }
 
 export const TEAM_PRESETS: { color: string; colorLight: string; emoji: string; defaultName: string }[] = [
