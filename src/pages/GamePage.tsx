@@ -8,11 +8,23 @@ import { HelpModal } from '@/components/board/HelpModal';
 import { TeamDashboard } from '@/components/board/TeamDashboard';
 import { useOnboarding } from '@/hooks/useOnboarding';
 import { OnboardingTooltip } from '@/components/board/OnboardingTooltip';
+import { useYutBoardLogic } from '@/hooks/useYutBoardLogic';
 
 const GamePage = () => {
   const navigate = useNavigate();
   const { gameState, movePiece, nextTurn, resetGame, restartGame } = useGameState();
   const { currentStep, isVisible, completeStep, skipOnboarding } = useOnboarding();
+
+  // 보드 로직을 페이지 레벨로 끌어올려 대시보드와 공유
+  const boardLogic = useYutBoardLogic(
+    gameState?.pieces || [], 
+    gameState?.teams || [], 
+    (pieceId, targetNodeId, isGoalMove) => {
+      movePiece(pieceId, targetNodeId, isGoalMove);
+      completeStep('game_move_piece');
+    },
+    gameState?.currentTurn
+  );
 
   useEffect(() => {
     if (!gameState) navigate('/', { replace: true });
@@ -73,6 +85,7 @@ const GamePage = () => {
                   completeStep('game_move_piece');
                 }}
                 currentTurn={gameState.currentTurn}
+                logic={boardLogic}
               />
               
               {/* Board Overlays / Tooltips */}
@@ -94,8 +107,8 @@ const GamePage = () => {
                   isVisible={isVisible}
                   step={currentStep}
                   targetStep="game_move_piece"
-                  title="말 이동 가이드"
-                  content="하단 대기석의 말을 보드 위로 드래그하여 이동시켜보세요. 또는 말을 클릭하여 상세 메뉴를 열 수도 있습니다."
+                  title="말 선택 및 이동"
+                  content="우측 팀 대시보드에서 '대기 중'인 말 아이콘을 클릭해보세요. 보드 위에 나타난 이동 메뉴를 통해 게임을 시작할 수 있습니다."
                   onNext={() => completeStep('game_move_piece')}
                   onSkip={skipOnboarding}
                   position="top"
@@ -124,6 +137,8 @@ const GamePage = () => {
                   pieces={gameState.pieces}
                   isCurrentTurn={gameState.currentTurn === team.id}
                   onNextTurn={gameState.currentTurn === team.id ? handleNextTurn : undefined}
+                  onSelectPiece={(pieceId) => boardLogic.setters.setSelectedPieceId(pieceId)}
+                  selectedPieceId={boardLogic.states.selectedPieceId}
                 />
                 <OnboardingTooltip 
                   isVisible={isVisible && gameState.currentTurn === team.id}

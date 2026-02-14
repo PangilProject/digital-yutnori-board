@@ -9,9 +9,18 @@ interface TeamDashboardProps {
   pieces: Piece[];
   isCurrentTurn: boolean;
   onNextTurn?: () => void;
+  onSelectPiece?: (pieceId: string) => void;
+  selectedPieceId?: string | null;
 }
 
-export const TeamDashboard = ({ team, pieces, isCurrentTurn, onNextTurn }: TeamDashboardProps) => {
+export const TeamDashboard = ({ 
+  team, 
+  pieces, 
+  isCurrentTurn, 
+  onNextTurn,
+  onSelectPiece,
+  selectedPieceId
+}: TeamDashboardProps) => {
   const teamPieces = pieces.filter(p => p.team === team.id);
   const finishedPieces = teamPieces.filter(p => p.isFinished);
   const activePieces = teamPieces.filter(p => p.nodeId !== null && !p.isFinished);
@@ -65,16 +74,22 @@ export const TeamDashboard = ({ team, pieces, isCurrentTurn, onNextTurn }: TeamD
             <Home size={12} className="text-muted-foreground" />
             <span className="text-[9px] font-black text-muted-foreground uppercase tracking-tighter">대기 중</span>
           </div>
-          <div className="flex flex-wrap gap-1">
+          <div className="flex flex-wrap gap-1.5">
             {waitingPieces.length > 0 ? (
               waitingPieces.map((p) => (
-                <div 
+                <button 
                   key={p.id} 
-                  className="w-5 h-5 rounded-full flex items-center justify-center text-[10px] shadow-sm border border-white/50"
+                  onClick={() => isCurrentTurn && onSelectPiece?.(p.id)}
+                  disabled={!isCurrentTurn}
+                  className={`w-7 h-7 rounded-full flex items-center justify-center text-sm shadow-sm border-2 transition-all ${
+                    selectedPieceId === p.id 
+                    ? 'scale-110 border-primary shadow-md ring-2 ring-primary/20 ring-offset-1' 
+                    : 'border-white/50 hover:scale-105 active:scale-95'
+                  } ${!isCurrentTurn ? 'cursor-not-allowed grayscale' : ''}`}
                   style={{ backgroundColor: team.colorLight }}
                 >
                   {team.emoji}
-                </div>
+                </button>
               ))
             ) : (
               <span className="text-[9px] text-muted-foreground/50 font-medium">없음</span>
@@ -88,17 +103,23 @@ export const TeamDashboard = ({ team, pieces, isCurrentTurn, onNextTurn }: TeamD
             <PlayCircle size={12} className="text-primary" />
             <span className="text-[9px] font-black text-primary uppercase tracking-tighter">활동 중</span>
           </div>
-          <div className="flex flex-wrap gap-1">
+          <div className="flex flex-wrap gap-1.5">
             {activePieces.length > 0 ? (
               activePieces.map((p) => (
-                <div 
+                <button 
                   key={p.id} 
-                  className="w-5 h-5 rounded-full flex items-center justify-center text-[10px] shadow-sm border border-white/50"
+                  onClick={() => isCurrentTurn && onSelectPiece?.(p.id)}
+                  disabled={!isCurrentTurn}
+                  className={`w-7 h-7 rounded-full flex items-center justify-center text-sm shadow-sm border-2 transition-all ${
+                    selectedPieceId === p.id 
+                    ? 'scale-110 border-white shadow-md ring-2 ring-primary/40 ring-offset-1' 
+                    : 'border-white/50 hover:scale-105 active:scale-95'
+                  } ${!isCurrentTurn ? 'cursor-not-allowed grayscale' : ''}`}
                   style={{ backgroundColor: team.color, color: 'white' }}
                   title={`위치: ${p.nodeId}`}
                 >
                   {team.emoji}
-                </div>
+                </button>
               ))
             ) : (
               <span className="text-[9px] text-primary/30 font-medium">없음</span>
