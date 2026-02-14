@@ -69,7 +69,11 @@ export function useYutBoardLogic(
       } else {
         // 애니메이션 완료: 실제 게임 상태(gameState)를 업데이트
         const finalNodeId = animatingPiece.path[animatingPiece.path.length - 1];
-        onMovePiece(animatingPiece.id, finalNodeId);
+        if (finalNodeId === 'goal') {
+          onMovePiece(animatingPiece.id, null, true);
+        } else {
+          onMovePiece(animatingPiece.id, finalNodeId);
+        }
         setAnimatingPiece(null);
       }
     }, 250);
@@ -150,6 +154,10 @@ export function useYutBoardLogic(
       // 함께 업힌 말들도 같이 애니메이션 되도록 처리
       if (targetPiece && piece.team === targetPiece.team && piece.nodeId === targetPiece.nodeId && !piece.isFinished) {
         const nodeId = animatingPiece.path[animatingPiece.currentIndex];
+        
+        // 'goal' 특수 노드 처리
+        if (nodeId === 'goal') return { x: 50, y: 565 }; // GOAL_ZONE 중심 좌표
+
         const node = nodeMap.get(nodeId);
         return node ? { x: node.x, y: node.y } : { x: 0, y: 0 };
       }

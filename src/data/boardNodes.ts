@@ -146,6 +146,12 @@ export function getMovementPath(startNodeId: string | null, steps: number): stri
     if (!currentId) {
       nextId = 'n1';
     } else {
+      // 골인 판정: n0에 도착하거나 n0를 통과하려고 할 때
+      if (currentId === 'n0') {
+        path.push('goal');
+        break;
+      }
+
       if (track === 'outer') {
         const num = parseInt(currentId.substring(1));
         if (currentId.startsWith('n') && num < 19) nextId = `n${num+1}`;
