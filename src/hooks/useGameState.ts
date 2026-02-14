@@ -123,7 +123,12 @@ export function useGameState() {
       
       // 업기 발생 통계 (기존에 없던 말이 합쳐진 경우)
       if (targetNodeId && !isGoalMove) {
-        const existingPieces = prev.pieces.filter(p => p.nodeId === targetNodeId && p.team === piece.team && !p.isFinished);
+        const existingPieces = prev.pieces.filter(p => 
+          p.nodeId === targetNodeId && 
+          p.team === piece.team && 
+          !p.isFinished &&
+          !stackIds.includes(p.id)
+        );
         if (existingPieces.length > 0) {
           teamStats.stackCount += 1;
         }
