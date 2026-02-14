@@ -2,15 +2,26 @@ import React from 'react';
 import { Piece, TeamConfig } from '@/types/game';
 
 interface YutPieceProps {
+  /** The specific piece data */
   piece: Piece;
+  /** Configuration for the piece's team (color, emoji) */
   team: TeamConfig;
+  /** Current absolute SVG coordinates for the piece */
   pos: { x: number; y: number };
+  /** Number of pieces stacked together (업기) */
   count: number;
+  /** Whether the piece is currently being dragged by the user */
   isDragging: boolean;
+  /** Interaction handler for pointer down events */
   onPointerDown: (e: React.PointerEvent) => void;
+  /** Base radius for the piece circle */
   radius: number;
 }
 
+/**
+ * Component for rendering a game piece.
+ * Includes visual treatment for dragging, team colors, and a "stack count" badge (업기).
+ */
 const YutPiece: React.FC<YutPieceProps> = ({ 
   piece, 
   team, 
@@ -26,7 +37,7 @@ const YutPiece: React.FC<YutPieceProps> = ({
       filter={isDragging ? undefined : 'url(#pieceShadow)'}
       onPointerDown={onPointerDown}
     >
-      {/* Piece body */}
+      {/* Outer piece body using team's primary color */}
       <circle
         cx={pos.x}
         cy={pos.y}
@@ -35,7 +46,7 @@ const YutPiece: React.FC<YutPieceProps> = ({
         stroke={isDragging ? 'hsl(45, 100%, 60%)' : team.colorLight}
         strokeWidth={isDragging ? 3 : 2}
       />
-      {/* Piece inner ring */}
+      {/* Inner decorative circle using team's light color */}
       <circle
         cx={pos.x}
         cy={pos.y}
@@ -43,7 +54,7 @@ const YutPiece: React.FC<YutPieceProps> = ({
         fill={team.colorLight}
         pointerEvents="none"
       />
-      {/* Piece shine */}
+      {/* Subtle shine effect for a premium look */}
       <circle
         cx={pos.x - (radius * 0.25)}
         cy={pos.y - (radius * 0.3)}
@@ -51,7 +62,7 @@ const YutPiece: React.FC<YutPieceProps> = ({
         fill="rgba(255,255,255,0.35)"
         pointerEvents="none"
       />
-      {/* Stack badge */}
+      {/* Stack badge (e.g., ×2) shown when multiple pieces move together */}
       {count > 1 && (
         <g pointerEvents="none">
           <circle

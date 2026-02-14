@@ -1,13 +1,18 @@
 import React from 'react';
 
 interface CaptureEffectComponentProps {
+  /** The position and unique ID of the capture effect */
   effect: { x: number; y: number; id: string };
 }
 
+/**
+ * Component rendering the visual feedback for capturing an opponent's piece.
+ * Includes shockwave circles and an animated fire/explosion emoji.
+ */
 const CaptureEffectComponent: React.FC<CaptureEffectComponentProps> = ({ effect }) => {
   return (
     <g key={effect.id}>
-      {/* Shockwaves */}
+      {/* Expanding shockwaves for visual impact */}
       <circle cx={effect.x} cy={effect.y} r={10} fill="none" stroke="white" strokeWidth="4">
         <animate attributeName="r" from="10" to="100" dur="0.6s" repeatCount="1" fill="freeze" />
         <animate attributeName="opacity" from="1" to="0" dur="0.6s" repeatCount="1" fill="freeze" />
@@ -21,7 +26,7 @@ const CaptureEffectComponent: React.FC<CaptureEffectComponentProps> = ({ effect 
         <animate attributeName="opacity" from="1" to="0" dur="1s" repeatCount="1" fill="freeze" />
       </circle>
       
-      {/* Explosion Text */}
+      {/* Central explosion emoji with rotation and scale animations */}
       <text
         x={effect.x}
         y={effect.y}

@@ -1,11 +1,18 @@
 import React from 'react';
 
 interface MoveMenuProps {
+  /** The position above which the menu should appear */
   pos: { x: number; y: number };
+  /** Callback triggered when a move option is selected */
   onMoveOption: (steps: number) => void;
 }
 
+/**
+ * Component for movement options tooltip (도, 개, 걸, 윷, 모, 빽도).
+ * Appears when a piece is clicked/tapped, enabling strategic movement choices.
+ */
 const MoveMenu: React.FC<MoveMenuProps> = ({ pos, onMoveOption }) => {
+  // Move values and corresponding traditional Korean labels
   const options = [
     { label: '도', steps: 1, color: 'hsl(200, 70%, 50%)' },
     { label: '개', steps: 2, color: 'hsl(180, 70%, 45%)' },
@@ -17,7 +24,7 @@ const MoveMenu: React.FC<MoveMenuProps> = ({ pos, onMoveOption }) => {
 
   return (
     <g className="animate-in fade-in zoom-in duration-200" transform={`translate(${pos.x}, ${pos.y - 45})`}>
-      {/* Backdrop */}
+      {/* Semi-transparent white background with glassmorphism feel */}
       <rect x="-105" y="-30" width="210" height="60" rx="12" fill="white" filter="url(#nodeShadow)" fillOpacity="0.9" />
       <path d="M -8 30 L 0 38 L 8 30 Z" fill="white" fillOpacity="0.9" />
       
@@ -26,12 +33,13 @@ const MoveMenu: React.FC<MoveMenuProps> = ({ pos, onMoveOption }) => {
           key={opt.label} 
           transform={`translate(${-85 + i * 34}, 0)`} 
           style={{ cursor: 'pointer' }}
-          onPointerDown={(e) => e.stopPropagation()}
+          onPointerDown={(e) => e.stopPropagation()} // Prevent deselecting the piece
           onClick={(e) => {
             e.stopPropagation();
             onMoveOption(opt.steps);
           }}
         >
+          {/* Circular button for each move option */}
           <circle r="14" fill={opt.color} className="hover:filter hover:brightness-110 transition-all" />
           <text 
             textAnchor="middle" 
@@ -43,6 +51,7 @@ const MoveMenu: React.FC<MoveMenuProps> = ({ pos, onMoveOption }) => {
           >
             {opt.label}
           </text>
+          {/* Small move count indicator (e.g., +3) */}
           <text
             y="20"
             textAnchor="middle"
