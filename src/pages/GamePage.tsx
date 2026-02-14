@@ -39,10 +39,6 @@ const GamePage = () => {
     completeStep('game_next_turn');
   };
 
-  // 팀을 좌우로 나누기 (PC 레이아웃용)
-  const leftTeams = gameState.teams.filter((_, i) => i % 2 === 0);
-  const rightTeams = gameState.teams.filter((_, i) => i % 2 !== 0);
-
   return (
     <div className="min-h-screen p-3 md:p-6 lg:p-10"
       style={{ background: 'linear-gradient(180deg, hsl(35, 45%, 94%) 0%, hsl(30, 35%, 88%) 100%)' }}>
@@ -62,37 +58,13 @@ const GamePage = () => {
         </div>
       </div>
 
-      <div className="max-w-[1600px] mx-auto">
-        {/* Main Grid Layout */}
-        <div className="grid grid-cols-1 lg:grid-cols-[320px_1fr_320px] gap-8 items-start">
+      <div className="max-w-[1700px] mx-auto">
+        {/* Main Grid Layout: 2 Columns on PC/Tablet */}
+        <div className="grid grid-cols-1 lg:grid-cols-[1fr_380px] gap-8 items-start">
           
-          {/* Left Side: Teams 0, 2 */}
-          <div className="flex flex-col gap-6 order-2 lg:order-1">
-            {leftTeams.map(team => (
-              <div key={team.id} className="relative">
-                <TeamDashboard 
-                  team={team}
-                  pieces={gameState.pieces}
-                  isCurrentTurn={gameState.currentTurn === team.id}
-                  onNextTurn={gameState.currentTurn === team.id ? handleNextTurn : undefined}
-                />
-                <OnboardingTooltip 
-                  isVisible={isVisible && gameState.currentTurn === team.id}
-                  step={currentStep}
-                  targetStep="game_next_turn"
-                  title="턴 넘기기"
-                  content="말을 모두 이동시켰다면 팀보드 하단 버튼을 눌러 상대 팀에게 기회를 넘겨주세요."
-                  onNext={() => completeStep('game_next_turn')}
-                  onSkip={skipOnboarding}
-                  position="top"
-                />
-              </div>
-            ))}
-          </div>
-
-          {/* Center: Yut Board */}
-          <div className="relative flex-1 flex flex-col items-center order-1 lg:order-2">
-            <div className="relative w-full max-w-[650px] bg-white/50 p-4 md:p-8 rounded-[2rem] shadow-inner-lg border-2 border-white/20">
+          {/* Main Area: Yut Board */}
+          <div className="relative flex-1 flex flex-col items-center order-1">
+            <div className="relative w-full max-w-[800px] bg-white/40 p-6 md:p-12 rounded-[3rem] shadow-inner-lg border-2 border-white/30 backdrop-blur-sm">
               <YutBoard
                 pieces={gameState.pieces}
                 teams={gameState.teams}
@@ -132,14 +104,20 @@ const GamePage = () => {
             </div>
             
             {/* Legend or subtle info */}
-            <p className="mt-6 text-xs font-bold text-muted-foreground uppercase tracking-widest opacity-50">
-              Traditional Digital Experience • Digital Yutnori
+            <p className="mt-8 text-xs font-black text-muted-foreground uppercase tracking-[0.3em] opacity-30">
+              Traditional Strategy Digital Board • 윷놀이
             </p>
           </div>
 
-          {/* Right Side: Teams 1, 3 */}
-          <div className="flex flex-col gap-6 order-3">
-            {rightTeams.map(team => (
+          {/* Sidebar Area: All Team Dashboards */}
+          <div className="flex flex-col gap-5 order-2">
+            <div className="mb-2 px-2">
+              <h2 className="text-sm font-black text-muted-foreground uppercase tracking-widest flex items-center gap-2">
+                <div className="w-2 h-2 rounded-full bg-primary animate-pulse" />
+                Team Status
+              </h2>
+            </div>
+            {gameState.teams.map(team => (
               <div key={team.id} className="relative">
                 <TeamDashboard 
                   team={team}
