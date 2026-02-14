@@ -12,8 +12,14 @@ interface TeamSetup {
   pieceCount: number;
 }
 
+import { HelpModal } from '@/components/board/HelpModal';
+
+import { useOnboarding } from '@/hooks/useOnboarding';
+import { OnboardingTooltip } from '@/components/board/OnboardingTooltip';
+
 const SetupPage = () => {
   const navigate = useNavigate();
+  const { currentStep, isVisible, completeStep, skipOnboarding } = useOnboarding();
   const [teamCount, setTeamCount] = useState(2);
   const [teamSetups, setTeamSetups] = useState<TeamSetup[]>([
     { name: '', pieceCount: 4 },
@@ -39,6 +45,7 @@ const SetupPage = () => {
         emoji: preset.emoji,
       };
     });
+    completeStep('setup_team_config');
     initializeGame(teams);
     navigate('/game');
   };
@@ -46,7 +53,10 @@ const SetupPage = () => {
   return (
     <div className="min-h-screen flex items-center justify-center p-4"
       style={{ background: 'linear-gradient(135deg, hsl(35, 45%, 88%) 0%, hsl(25, 40%, 82%) 50%, hsl(35, 35%, 85%) 100%)' }}>
-      <Card className="w-full max-w-lg shadow-2xl border-2 border-border">
+      <Card className="w-full max-w-lg shadow-2xl border-2 border-border relative">
+        <div className="absolute top-4 right-4 z-20">
+          <HelpModal />
+        </div>
         <CardHeader className="text-center pb-4">
           <div className="text-5xl mb-2">🎲</div>
           <CardTitle className="text-3xl font-extrabold tracking-tight text-foreground">윷놀이</CardTitle>
@@ -54,25 +64,40 @@ const SetupPage = () => {
         </CardHeader>
         <CardContent className="space-y-5">
           {/* Team count selector */}
-          <div className="flex items-center justify-center gap-3 mb-2">
-            <Label className="text-sm font-semibold">팀 수:</Label>
-            {[2, 3, 4].map(n => (
-              <button
-                key={n}
-                onClick={() => setTeamCount(n)}
-                className={`w-10 h-10 rounded-full font-bold text-lg transition-all ${
-                  teamCount === n
-                    ? 'bg-foreground text-background shadow-lg scale-110'
-                    : 'bg-secondary text-secondary-foreground hover:bg-accent'
-                }`}
-              >
-                {n}
-              </button>
-            ))}
+          <div className="flex flex-col items-center gap-3 mb-2">
+            <div className="relative flex items-center gap-3">
+              <Label className="text-sm font-semibold">팀 수:</Label>
+              {[2, 3, 4].map(n => (
+                <button
+                  key={n}
+                  onClick={() => {
+                    setTeamCount(n);
+                    completeStep('setup_team_count');
+                  }}
+                  className={`w-10 h-10 rounded-full font-bold text-lg transition-all ${
+                    teamCount === n
+                      ? 'bg-foreground text-background shadow-lg scale-110'
+                      : 'bg-secondary text-secondary-foreground hover:bg-accent'
+                  }`}
+                >
+                  {n}
+                </button>
+              ))}
+              <OnboardingTooltip 
+                isVisible={isVisible}
+                step={currentStep}
+                targetStep="setup_team_count"
+                title="팀 구성하기"
+                content="먼저 함께 게임을 즐길 팀의 수를 선택해주세요. 2팀부터 최대 4팀까지 가능합니다."
+                onNext={() => completeStep('setup_team_count')}
+                onSkip={skipOnboarding}
+                position="top"
+              />
+            </div>
           </div>
 
           {/* Team configs */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div className="relative grid grid-cols-1 sm:grid-cols-2 gap-4">
             {Array.from({ length: teamCount }, (_, i) => {
               const preset = TEAM_PRESETS[i];
               return (
@@ -116,6 +141,16 @@ const SetupPage = () => {
                 </div>
               );
             })}
+            <OnboardingTooltip 
+              isVisible={isVisible}
+              step={currentStep}
+              targetStep="setup_team_config"
+              title="상세 설정"
+              content="각 팀의 이름과 사용할 말의 개수(1~5개)를 자유롭게 설정할 수 있습니다."
+              onNext={() => completeStep('setup_team_config')}
+              onSkip={skipOnboarding}
+              position="top"
+            />
           </div>
 
           <Button onClick={handleStart} className="w-full text-lg h-12 font-bold" size="lg">

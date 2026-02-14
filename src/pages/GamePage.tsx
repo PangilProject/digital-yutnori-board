@@ -6,9 +6,15 @@ import GameLog from '@/components/GameLog';
 import GameResult from '@/components/board/GameResult';
 import { useGameState } from '@/hooks/useGameState';
 
+import { HelpModal } from '@/components/board/HelpModal';
+
+import { useOnboarding } from '@/hooks/useOnboarding';
+import { OnboardingTooltip } from '@/components/board/OnboardingTooltip';
+
 const GamePage = () => {
   const navigate = useNavigate();
   const { gameState, movePiece, nextTurn, resetGame, restartGame } = useGameState();
+  const { currentStep, isVisible, completeStep, skipOnboarding } = useOnboarding();
 
   useEffect(() => {
     if (!gameState) navigate('/', { replace: true });
@@ -38,15 +44,23 @@ const GamePage = () => {
     return gameState.teams.find(t => t.id === teamId)?.pieceCount || 0;
   };
 
+  const handleNextTurn = () => {
+    nextTurn();
+    completeStep('game_next_turn');
+  };
+
   return (
     <div className="min-h-screen p-2 md:p-4"
       style={{ background: 'linear-gradient(180deg, hsl(35, 45%, 90%) 0%, hsl(30, 35%, 85%) 100%)' }}>
       {/* Header */}
       <div className="flex items-center justify-between mb-3 px-2">
         <h1 className="text-xl md:text-2xl font-extrabold text-foreground tracking-tight">🎲 윷놀이 말판</h1>
-        <Button variant="destructive" size="sm" onClick={handleReset} className="font-semibold">
-          🔄 초기화
-        </Button>
+        <div className="flex items-center gap-2">
+          <HelpModal />
+          <Button variant="destructive" size="sm" onClick={handleReset} className="font-semibold px-4">
+            🔄 초기화
+          </Button>
+        </div>
       </div>
 
       {/* Team info bar - Responsive Grid */}
@@ -98,10 +112,10 @@ const GamePage = () => {
       </div>
 
       {/* Primary Turn Control */}
-      <div className="flex justify-center mb-4 px-2">
+      <div className="relative flex justify-center mb-4 px-2">
         <Button 
           size="lg" 
-          onClick={() => nextTurn()} 
+          onClick={handleNextTurn} 
           className="w-full md:w-auto md:min-w-[300px] h-14 text-lg font-black shadow-xl transition-all duration-300 transform hover:scale-105 active:scale-95"
           style={{
             background: gameState.teams.find(t => t.id === gameState.currentTurn)?.color || 'black',
@@ -110,17 +124,58 @@ const GamePage = () => {
         >
           ⏭️ {gameState.teams.find(t => t.id === gameState.currentTurn)?.name} 턴 넘기기
         </Button>
+        <OnboardingTooltip 
+          isVisible={isVisible}
+          step={currentStep}
+          targetStep="game_next_turn"
+          title="턴 넘기기"
+          content="말을 모두 이동시켰다면 버튼을 눌러 상대 팀에게 기회를 넘겨주세요."
+          onNext={() => completeStep('game_next_turn')}
+          onSkip={skipOnboarding}
+          position="top"
+        />
       </div>
 
       {/* Main layout */}
       <div className="flex flex-col lg:flex-row gap-4">
-        <div className="flex-1 flex justify-center">
+        <div className="relative flex-1 flex justify-center">
           <YutBoard
             pieces={gameState.pieces}
             teams={gameState.teams}
-            onMovePiece={movePiece}
+            onMovePiece={(pieceId, targetNodeId, isGoalMove) => {
+              movePiece(pieceId, targetNodeId, isGoalMove);
+              completeStep('game_move_piece');
+            }}
             currentTurn={gameState.currentTurn}
           />
+          
+          {/* 보드 위쪽 가이드 (게임 시작) */}
+          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-1 h-1">
+            <OnboardingTooltip 
+              isVisible={isVisible}
+              step={currentStep}
+              targetStep="game_start"
+              title="게임판 시작"
+              content="이제 본격적으로 게임을 시작합니다! 현재 턴인 팀의 말을 움직여보세요."
+              onNext={() => completeStep('game_start')}
+              onSkip={skipOnboarding}
+              position="top"
+            />
+          </div>
+
+          {/* 보드 아래쪽 가이드 (말 이동) - 대기석 근처에 배치 */}
+          <div className="absolute bottom-20 left-1/2 -translate-x-1/2 w-1 h-1">
+            <OnboardingTooltip 
+              isVisible={isVisible}
+              step={currentStep}
+              targetStep="game_move_piece"
+              title="말 이동하기"
+              content="하단 대기석에 있는 말을 보드 위로 드래그하여 이동시켜보세요. 또는 말을 클릭하여 메뉴를 열 수도 있습니다."
+              onNext={() => completeStep('game_move_piece')}
+              onSkip={skipOnboarding}
+              position="top"
+            />
+          </div>
         </div>
 
         <div className="lg:w-80 h-52 lg:h-[620px]">
