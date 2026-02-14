@@ -118,8 +118,11 @@ export function useGameState() {
       const nextStats = { ...prev.stats };
       const teamStats = { ...nextStats[piece.team] };
 
-      // 이동 횟수 증가
-      teamStats.moveCount += 1;
+      // 이동 횟수 증가 (실제로 이동했거나 골인한 경우만)
+      const isActuallyMoving = isGoalMove || targetNodeId !== piece.nodeId;
+      if (isActuallyMoving) {
+        teamStats.moveCount += 1;
+      }
       
       // 업기 발생 통계 (기존에 없던 말이 합쳐진 경우)
       if (targetNodeId && !isGoalMove) {
