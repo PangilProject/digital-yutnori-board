@@ -2,21 +2,21 @@ import React from 'react';
 import { GameNode } from '@/types/game';
 
 interface YutNodeProps {
-  /** The node data defining position, label, and type */
+  /** 노드 위치, 라벨, 타입 등을 정의하는 데이터 */
   node: GameNode;
 }
 
 /**
- * Component for rendering a single node (circle) on the Yutnori board.
- * Each node's size and color are determined by its type (Corner, Center, or standard).
+ * 윷놀이 보드의 개별 노드(원)를 그리는 컴포넌트입니다.
+ * 노드의 타입(모서리, 중앙, 일반)에 따라 크기와 색상이 결정됩니다.
  */
 const YutNode: React.FC<YutNodeProps> = ({ node }) => {
-  // Corner and center nodes are larger and more prominent
+  // 모서리와 중앙 노드는 더 크고 눈에 띄게 표시
   const r = node.isCorner ? 22 : node.isCenter ? 20 : 13;
   
   return (
     <g filter="url(#nodeShadow)">
-      {/* Main node circle */}
+      {/* 노드 본체 원 */}
       <circle
         cx={node.x}
         cy={node.y}
@@ -31,7 +31,7 @@ const YutNode: React.FC<YutNodeProps> = ({ node }) => {
         stroke="hsl(28, 25%, 38%)"
         strokeWidth="2"
       />
-      {/* Inner decorative ring for major nodes */}
+      {/* 주요 노드(모서리, 중앙)의 내부 장식 링 */}
       {(node.isCorner || node.isCenter) && (
         <circle
           cx={node.x}
@@ -42,7 +42,7 @@ const YutNode: React.FC<YutNodeProps> = ({ node }) => {
           strokeWidth="1"
         />
       )}
-      {/* Node label (e.g., '출발', '방') */}
+      {/* 노드 라벨 (예: '출발', '방', '모') */}
       {node.label && (
         <text
           x={node.x}

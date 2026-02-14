@@ -2,25 +2,25 @@ import React from 'react';
 import { Piece, TeamConfig } from '@/types/game';
 
 interface YutPieceProps {
-  /** The specific piece data */
+  /** 말의 고유 데이터 */
   piece: Piece;
-  /** Configuration for the piece's team (color, emoji) */
+  /** 말이 속한 팀의 설정 (색상, 이모지 등) */
   team: TeamConfig;
-  /** Current absolute SVG coordinates for the piece */
+  /** 말의 현재 절대 SVG 좌표 */
   pos: { x: number; y: number };
-  /** Number of pieces stacked together (업기) */
+  /** 함께 업힌 말의 총 개수 */
   count: number;
-  /** Whether the piece is currently being dragged by the user */
+  /** 사용자가 현재 말을 드래그 중인지 여부 */
   isDragging: boolean;
-  /** Interaction handler for pointer down events */
+  /** 포인터 다운 이벤트 핸들러 */
   onPointerDown: (e: React.PointerEvent) => void;
-  /** Base radius for the piece circle */
+  /** 말의 기본 원 반지름 */
   radius: number;
 }
 
 /**
- * Component for rendering a game piece.
- * Includes visual treatment for dragging, team colors, and a "stack count" badge (업기).
+ * 게임 말을 그리는 컴포넌트입니다.
+ * 드래그 상태에 따른 시각 효과, 팀 색상, 업기 상태를 나타내는 '스택 배지'를 포함합니다.
  */
 const YutPiece: React.FC<YutPieceProps> = ({ 
   piece, 
@@ -37,7 +37,7 @@ const YutPiece: React.FC<YutPieceProps> = ({
       filter={isDragging ? undefined : 'url(#pieceShadow)'}
       onPointerDown={onPointerDown}
     >
-      {/* Outer piece body using team's primary color */}
+      {/* 팀의 기본 색상을 사용하는 말 본체 */}
       <circle
         cx={pos.x}
         cy={pos.y}
@@ -46,7 +46,7 @@ const YutPiece: React.FC<YutPieceProps> = ({
         stroke={isDragging ? 'hsl(45, 100%, 60%)' : team.colorLight}
         strokeWidth={isDragging ? 3 : 2}
       />
-      {/* Inner decorative circle using team's light color */}
+      {/* 팀의 연한 색상을 사용하는 내부 장식 원 */}
       <circle
         cx={pos.x}
         cy={pos.y}
@@ -54,7 +54,7 @@ const YutPiece: React.FC<YutPieceProps> = ({
         fill={team.colorLight}
         pointerEvents="none"
       />
-      {/* Subtle shine effect for a premium look */}
+      {/* 프리미엄한 느낌을 주기 위한 입체감(광택) 효과 */}
       <circle
         cx={pos.x - (radius * 0.25)}
         cy={pos.y - (radius * 0.3)}
@@ -62,7 +62,7 @@ const YutPiece: React.FC<YutPieceProps> = ({
         fill="rgba(255,255,255,0.35)"
         pointerEvents="none"
       />
-      {/* Stack badge (e.g., ×2) shown when multiple pieces move together */}
+      {/* '업기' 상태일 때 나타나는 배지 (예: ×2) */}
       {count > 1 && (
         <g pointerEvents="none">
           <circle

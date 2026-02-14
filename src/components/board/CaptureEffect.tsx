@@ -1,18 +1,18 @@
 import React from 'react';
 
 interface CaptureEffectComponentProps {
-  /** The position and unique ID of the capture effect */
+  /** 캡처 효과의 위치와 고유 ID */
   effect: { x: number; y: number; id: string };
 }
 
 /**
- * Component rendering the visual feedback for capturing an opponent's piece.
- * Includes shockwave circles and an animated fire/explosion emoji.
+ * 상대방의 말을 잡았을 때 나타나는 시각적 피드백 효과를 렌더링하는 컴포넌트입니다.
+ * 여러 겹의 퍼져나가는 충격파 원과 화염/폭발 이모지 애니메이션으로 구성됩니다.
  */
 const CaptureEffectComponent: React.FC<CaptureEffectComponentProps> = ({ effect }) => {
   return (
     <g key={effect.id}>
-      {/* Expanding shockwaves for visual impact */}
+      {/* 강렬한 시각적 타격감을 위해 퍼져나가는 충격파 효과들 */}
       <circle cx={effect.x} cy={effect.y} r={10} fill="none" stroke="white" strokeWidth="4">
         <animate attributeName="r" from="10" to="100" dur="0.6s" repeatCount="1" fill="freeze" />
         <animate attributeName="opacity" from="1" to="0" dur="0.6s" repeatCount="1" fill="freeze" />
@@ -26,7 +26,7 @@ const CaptureEffectComponent: React.FC<CaptureEffectComponentProps> = ({ effect 
         <animate attributeName="opacity" from="1" to="0" dur="1s" repeatCount="1" fill="freeze" />
       </circle>
       
-      {/* Central explosion emoji with rotation and scale animations */}
+      {/* 중앙의 폭발 이모지 - 크기 변화와 회전 애니메이션 적용 */}
       <text
         x={effect.x}
         y={effect.y}
