@@ -64,7 +64,7 @@ const GamePage = () => {
           
           {/* Main Area: Yut Board */}
           <div className="relative flex-1 flex flex-col items-center order-1">
-            <div className="relative w-full max-w-[800px] bg-white/40 p-6 md:p-12 rounded-[3rem] shadow-inner-lg border-2 border-white/30 backdrop-blur-sm">
+            <div className="relative w-full max-w-[1000px] bg-white/40 p-4 md:p-8 rounded-[3rem] shadow-inner-lg border-2 border-white/30 backdrop-blur-sm">
               <YutBoard
                 pieces={gameState.pieces}
                 teams={gameState.teams}

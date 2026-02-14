@@ -22,7 +22,7 @@ interface YutBoardProps {
 }
 
 /** 고정 레이아웃 상수 */
-const PIECE_RADIUS = 16;
+const PIECE_RADIUS = 13;
 const GOAL_ZONE = { x: 50, y: 565, w: 60, h: 40 }; // 골인(종료) 처리를 위한 시각적 영역
 
 /**
