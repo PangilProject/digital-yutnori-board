@@ -22,16 +22,29 @@ const MoveMenu: React.FC<MoveMenuProps> = ({ pos, onMoveOption }) => {
     { label: '빽', steps: -1, color: 'hsl(0, 0%, 40%)' },
   ];
 
+  // 메뉴가 보드판(0~600) 밖으로 나가지 않도록 X 좌표를 제한 (메뉴 너비 약 240)
+  const menuWidth = 240;
+  const halfWidth = menuWidth / 2;
+  const margin = 10; // 최소 여백
+  const clampedX = Math.min(Math.max(halfWidth + margin, pos.x), 600 - halfWidth - margin);
+  
+  // 말 위치가 구석일 때 메뉴 박스가 밀리더라도 화살표는 말을 가리키도록 오프셋 계산
+  const arrowOffset = pos.x - clampedX;
+
+  // 보드 상단(0) 밖으로 나가지 않도록 Y 좌표도 조정
+  const menuY = Math.max(80, pos.y);
+
   return (
-    <g className="animate-in fade-in zoom-in duration-200" transform={`translate(${pos.x}, ${pos.y - 45})`}>
+    <g className="animate-in fade-in zoom-in duration-200" transform={`translate(${clampedX}, ${menuY - 45})`}>
       {/* 반투명한 흰색 배경 (Glassmorphism 느낌) */}
-      <rect x="-105" y="-30" width="210" height="60" rx="12" fill="white" filter="url(#nodeShadow)" fillOpacity="0.9" />
-      <path d="M -8 30 L 0 38 L 8 30 Z" fill="white" fillOpacity="0.9" />
+      <rect x={-halfWidth} y="-30" width={menuWidth} height="60" rx="12" fill="white" filter="url(#nodeShadow)" fillOpacity="0.95" />
+      {/* 가리키는 화살표 - 실제 말 위치로 오프셋 적용 */}
+      <path d={`M ${arrowOffset - 8} 30 L ${arrowOffset} 38 L ${arrowOffset + 8} 30 Z`} fill="white" fillOpacity="0.95" />
       
       {options.map((opt, i) => (
         <g 
           key={opt.label} 
-          transform={`translate(${-85 + i * 34}, 0)`} 
+          transform={`translate(${-95 + i * 38}, 0)`} 
           style={{ cursor: 'pointer' }}
           onPointerDown={(e) => e.stopPropagation()} // 클릭 시 선택된 말이 해제되지 않도록 전파 중단
           onClick={(e) => {
