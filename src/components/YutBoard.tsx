@@ -134,7 +134,7 @@ const YutBoard = ({ pieces, teams, onMovePiece, currentTurn }: YutBoardProps) =>
   return (
     <svg
       ref={svgRef}
-      viewBox={`0 0 600 690`}
+      viewBox={`0 -80 600 770`}
       className="w-full max-w-[600px] mx-auto touch-none select-none"
       onPointerDown={() => setSelectedPieceId(null)} // 보드 배경 클릭 시 이동 메뉴 닫기
       onPointerMove={handlePointerMove}
@@ -142,6 +142,20 @@ const YutBoard = ({ pieces, teams, onMovePiece, currentTurn }: YutBoardProps) =>
       onPointerCancel={handlePointerUp}
     >
       <YutBoardDefs isShaking={isShaking} />
+
+      {/* 상단 골인 선반 (Finish Shelf) */}
+      <rect x="15" y="-70" width="570" height="60" rx="10" fill="hsl(35, 20%, 94%)" stroke="hsl(35, 10%, 80%)" strokeWidth="1" strokeDasharray="4 2" />
+      {teams.map((team, i) => {
+        const cols = teams.length;
+        const baseX = 20 + i * (560 / cols) + 30;
+        return (
+          <g key={`goal-label-${team.id}`}>
+            <text x={baseX} y="-52" fontSize="10" fontWeight="bold" fill={team.color} opacity="0.6">
+              {team.emoji} FINISHED
+            </text>
+          </g>
+        );
+      })}
 
       <g className={isShaking ? 'shake-it' : ''}>
         {/* 메인 보드 판 프레임 */}

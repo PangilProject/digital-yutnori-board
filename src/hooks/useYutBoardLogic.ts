@@ -172,11 +172,21 @@ export function useYutBoardLogic(
       }
     }
 
-    // 3. 골인하여 이미 나간 말의 경우 (보드 구석에 표시)
+    // 3. 골인하여 이미 나간 말의 경우 (보드판 상단 외부 선반에 정렬)
     if (piece.isFinished) {
       const teamIndex = teams.findIndex(t => t.id === piece.team);
       const finishedPieces = pieces.filter(p => p.team === piece.team && p.isFinished);
-      return { x: 550 - finishedPieces.indexOf(piece) * 15, y: 580 - teamIndex * 15 };
+      const pieceIndex = finishedPieces.indexOf(piece);
+      
+      const cols = teams.length;
+      const shelfWidth = 560 / cols;
+      const baseX = 20 + teamIndex * shelfWidth + shelfWidth / 2;
+      
+      // 상부 선반 위치 (y: -45 근처)
+      return { 
+        x: baseX - (finishedPieces.length - 1) * 10 + pieceIndex * 20, 
+        y: -40 
+      };
     }
 
     // 4. 보드판 위에 있는 경우
