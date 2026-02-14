@@ -108,7 +108,7 @@ const GamePage = () => {
                   step={currentStep}
                   targetStep="game_move_piece"
                   title="말 선택 및 이동"
-                  content="우측 팀 대시보드에서 '대기 중'인 말 아이콘을 클릭해보세요. 보드 위에 나타난 이동 메뉴를 통해 게임을 시작할 수 있습니다."
+                  content="우측 팀 대시보드에서 '아직 안 나옴' 말 아이콘을 클릭해보세요. 보드 위에 나타난 이동 메뉴를 통해 게임을 시작할 수 있습니다."
                   onNext={() => completeStep('game_move_piece')}
                   onSkip={skipOnboarding}
                   position="top"

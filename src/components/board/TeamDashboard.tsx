@@ -68,11 +68,11 @@ export const TeamDashboard = ({
 
       {/* Piece Status Lists */}
       <div className="grid grid-cols-2 gap-2 mt-1">
-        {/* Waiting Pieces */}
+        {/* Waiting Pieces (Not yet out) */}
         <div className="bg-muted/20 p-2 rounded-lg border border-transparent hover:border-muted-foreground/10 transition-all">
           <div className="flex items-center gap-1 mb-1.5">
             <Home size={12} className="text-muted-foreground" />
-            <span className="text-[9px] font-black text-muted-foreground uppercase tracking-tighter">대기 중</span>
+            <span className="text-[9px] font-black text-muted-foreground uppercase tracking-tighter">아직 안 나옴</span>
           </div>
           <div className="flex flex-wrap gap-1.5">
             {waitingPieces.length > 0 ? (
@@ -92,38 +92,22 @@ export const TeamDashboard = ({
                 </button>
               ))
             ) : (
-              <span className="text-[9px] text-muted-foreground/50 font-medium">없음</span>
+              <span className="text-[9px] text-muted-foreground/50 font-medium tracking-tight">모두 나감</span>
             )}
           </div>
         </div>
 
-        {/* Active Pieces */}
-        <div className="bg-primary/5 p-2 rounded-lg border border-primary/5 hover:border-primary/10 transition-all">
-          <div className="flex items-center gap-1 mb-1.5">
+        {/* Active Pieces (Count Only) */}
+        <div className="bg-primary/5 p-2 rounded-lg border border-primary/5 hover:border-primary/10 transition-all flex flex-col items-center justify-center">
+          <div className="flex items-center gap-1 mb-1">
             <PlayCircle size={12} className="text-primary" />
             <span className="text-[9px] font-black text-primary uppercase tracking-tighter">활동 중</span>
           </div>
-          <div className="flex flex-wrap gap-1.5">
-            {activePieces.length > 0 ? (
-              activePieces.map((p) => (
-                <button 
-                  key={p.id} 
-                  onClick={() => isCurrentTurn && onSelectPiece?.(p.id)}
-                  disabled={!isCurrentTurn}
-                  className={`w-7 h-7 rounded-full flex items-center justify-center text-sm shadow-sm border-2 transition-all ${
-                    selectedPieceId === p.id 
-                    ? 'scale-110 border-white shadow-md ring-2 ring-primary/40 ring-offset-1' 
-                    : 'border-white/50 hover:scale-105 active:scale-95'
-                  } ${!isCurrentTurn ? 'cursor-not-allowed grayscale' : ''}`}
-                  style={{ backgroundColor: team.color, color: 'white' }}
-                  title={`위치: ${p.nodeId}`}
-                >
-                  {team.emoji}
-                </button>
-              ))
-            ) : (
-              <span className="text-[9px] text-primary/30 font-medium">없음</span>
-            )}
+          <div className="flex items-baseline gap-1">
+            <span className="text-xl font-black text-primary leading-none">
+              {activePieces.length}
+            </span>
+            <span className="text-[10px] font-bold text-primary/60">마리</span>
           </div>
         </div>
       </div>

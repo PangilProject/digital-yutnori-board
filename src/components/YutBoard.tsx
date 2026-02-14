@@ -135,8 +135,10 @@ const YutBoard = ({ pieces, teams, onMovePiece, currentTurn, logic }: YutBoardPr
         {pieces.map(piece => {
           // 대기석이나 골인한 말은 보드판에서 더 이상 렌더링하지 않음 (대시보드 통합)
           if (!piece.nodeId || piece.isFinished) {
-            // 드래그 중이거나 애니메이션 중인 경우에만 예외적으로 렌더링
-            const isActiveInLogic = drag?.pieceId === piece.id || animatingPiece?.id === piece.id;
+            // 드래그 중, 애니메이션 중, 또는 선택된 경우에만 예외적으로 렌더링
+            const isActiveInLogic = drag?.pieceId === piece.id || 
+                                   animatingPiece?.id === piece.id || 
+                                   selectedPieceId === piece.id;
             if (!isActiveInLogic) return null;
           }
 

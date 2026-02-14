@@ -204,10 +204,19 @@ export function useYutBoardLogic(
       }
     }
 
-    // 5. 대기석에 있는 경우
-    const teamIndex = teams.findIndex(t => t.id === piece.team);
-    const teamPieces = pieces.filter(p => p.team === piece.team && p.nodeId === null && !p.isFinished);
-    return getHomePiecePosition(teamIndex, Math.max(0, teamPieces.indexOf(piece)), teamPieces.length);
+    // 5. 보드판 위에 없고 대기 중인 경우
+    if (piece.nodeId === null) {
+      // 만약 대시보드에서 선택된 말이라면, 보드판 위 입구 부근(n0 근처)에 표시하여 메뉴가 뜨게 함
+      if (selectedPieceId === piece.id) {
+        return { x: 550, y: 550 };
+      }
+      
+      const teamIndex = teams.findIndex(t => t.id === piece.team);
+      const teamPieces = pieces.filter(p => p.team === piece.team && p.nodeId === null && !p.isFinished);
+      return getHomePiecePosition(teamIndex, Math.max(0, teamPieces.indexOf(piece)), teamPieces.length);
+    }
+
+    return { x: 0, y: 0 };
   };
 
   return {
