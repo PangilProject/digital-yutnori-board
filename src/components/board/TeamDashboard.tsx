@@ -11,6 +11,7 @@ interface TeamDashboardProps {
   onNextTurn?: () => void;
   onSelectPiece?: (pieceId: string) => void;
   selectedPieceId?: string | null;
+  onMoveOption?: (pieceId: string, steps: number) => void;
 }
 
 export const TeamDashboard = ({ 
@@ -19,7 +20,8 @@ export const TeamDashboard = ({
   isCurrentTurn, 
   onNextTurn,
   onSelectPiece,
-  selectedPieceId
+  selectedPieceId,
+  onMoveOption
 }: TeamDashboardProps) => {
   const teamPieces = pieces.filter(p => p.team === team.id);
   const finishedPieces = teamPieces.filter(p => p.isFinished);
@@ -28,6 +30,15 @@ export const TeamDashboard = ({
   
   const totalCount = teamPieces.length;
   const finishedCount = finishedPieces.length;
+
+  const moveOptions = [
+    { label: '도', steps: 1, color: 'hsl(200, 70%, 50%)' },
+    { label: '개', steps: 2, color: 'hsl(180, 70%, 45%)' },
+    { label: '걸', steps: 3, color: 'hsl(150, 70%, 40%)' },
+    { label: '윷', steps: 4, color: 'hsl(45, 90%, 50%)' },
+    { label: '모', steps: 5, color: 'hsl(25, 90%, 50%)' },
+    { label: '빽', steps: -1, color: 'hsl(0, 0%, 40%)' },
+  ];
 
   return (
     <div 
@@ -72,27 +83,51 @@ export const TeamDashboard = ({
         <div className="bg-muted/20 p-2 rounded-lg border border-transparent hover:border-muted-foreground/10 transition-all">
           <div className="flex items-center gap-1 mb-1.5">
             <Home size={12} className="text-muted-foreground" />
-            <span className="text-[9px] font-black text-muted-foreground uppercase tracking-tighter">아직 안 나옴</span>
+            <span className="text-[9px] font-black text-muted-foreground uppercase tracking-tighter">안 나온 말</span>
           </div>
-          <div className="flex flex-wrap gap-1.5">
+          <div className="flex flex-wrap gap-1.5 relative">
             {waitingPieces.length > 0 ? (
               waitingPieces.map((p) => (
-                <button 
-                  key={p.id} 
-                  onClick={() => isCurrentTurn && onSelectPiece?.(p.id)}
-                  disabled={!isCurrentTurn}
-                  className={`w-7 h-7 rounded-full flex items-center justify-center text-sm shadow-sm border-2 transition-all ${
-                    selectedPieceId === p.id 
-                    ? 'scale-110 border-primary shadow-md ring-2 ring-primary/20 ring-offset-1' 
-                    : 'border-white/50 hover:scale-105 active:scale-95'
-                  } ${!isCurrentTurn ? 'cursor-not-allowed grayscale' : ''}`}
-                  style={{ backgroundColor: team.colorLight }}
-                >
-                  {team.emoji}
-                </button>
+                <div key={p.id} className="relative">
+                  <button 
+                    onClick={() => isCurrentTurn && onSelectPiece?.(p.id)}
+                    disabled={!isCurrentTurn}
+                    className={`w-7 h-7 rounded-full flex items-center justify-center text-sm shadow-sm border-2 transition-all ${
+                      selectedPieceId === p.id 
+                      ? 'scale-110 border-primary shadow-md ring-2 ring-primary/20 ring-offset-1' 
+                      : 'border-white/50 hover:scale-105 active:scale-95'
+                    } ${!isCurrentTurn ? 'cursor-not-allowed grayscale' : ''}`}
+                    style={{ backgroundColor: team.colorLight }}
+                  >
+                    {team.emoji}
+                  </button>
+
+                  {/* Dashboard Tulip Menu (MoveMenu) */}
+                  {selectedPieceId === p.id && isCurrentTurn && (
+                    <div className="absolute bottom-[calc(100%+8px)] left-1/2 -translate-x-1/2 z-[50] animate-in fade-in zoom-in slide-in-from-bottom-2 duration-200 pointer-events-auto">
+                      <div className="bg-white p-1 rounded-xl shadow-2xl border-2 border-primary/20 flex gap-1 whitespace-nowrap min-w-[180px] justify-center backdrop-blur-md bg-white/95">
+                        {moveOptions.map((opt) => (
+                          <button
+                            key={opt.label}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              onMoveOption?.(p.id, opt.steps);
+                            }}
+                            className="w-7 h-7 rounded-full text-[10px] font-black flex items-center justify-center text-white shadow-sm hover:scale-110 active:scale-90 transition-transform"
+                            style={{ backgroundColor: opt.color }}
+                          >
+                            {opt.label}
+                          </button>
+                        ))}
+                        {/* Arrow */}
+                        <div className="absolute top-[100%] left-1/2 -translate-x-1/2 w-0 h-0 border-l-[6px] border-l-transparent border-r-[6px] border-r-transparent border-t-[6px] border-t-white/95" />
+                      </div>
+                    </div>
+                  )}
+                </div>
               ))
             ) : (
-              <span className="text-[9px] text-muted-foreground/50 font-medium tracking-tight">모두 나감</span>
+              <span className="text-[9px] text-muted-foreground/50 font-medium tracking-tight">모든 말 출발</span>
             )}
           </div>
         </div>
@@ -101,13 +136,13 @@ export const TeamDashboard = ({
         <div className="bg-primary/5 p-2 rounded-lg border border-primary/5 hover:border-primary/10 transition-all flex flex-col items-center justify-center">
           <div className="flex items-center gap-1 mb-1">
             <PlayCircle size={12} className="text-primary" />
-            <span className="text-[9px] font-black text-primary uppercase tracking-tighter">활동 중</span>
+            <span className="text-[9px] font-black text-primary uppercase tracking-tighter">말판 위</span>
           </div>
           <div className="flex items-baseline gap-1">
             <span className="text-xl font-black text-primary leading-none">
               {activePieces.length}
             </span>
-            <span className="text-[10px] font-bold text-primary/60">마리</span>
+            <span className="text-[10px] font-bold text-primary/60">동</span>
           </div>
         </div>
       </div>

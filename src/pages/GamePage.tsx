@@ -108,7 +108,7 @@ const GamePage = () => {
                   step={currentStep}
                   targetStep="game_move_piece"
                   title="말 선택 및 이동"
-                  content="우측 팀 대시보드에서 '아직 안 나옴' 말 아이콘을 클릭해보세요. 보드 위에 나타난 이동 메뉴를 통해 게임을 시작할 수 있습니다."
+                  content="우측 팀 대시보드에서 '안 나온 말' 아이콘을 클릭해보세요. 보드판 하단에 나타난 이동 메뉴를 통해 게임을 시작할 수 있습니다."
                   onNext={() => completeStep('game_move_piece')}
                   onSkip={skipOnboarding}
                   position="top"
@@ -139,6 +139,17 @@ const GamePage = () => {
                   onNextTurn={gameState.currentTurn === team.id ? handleNextTurn : undefined}
                   onSelectPiece={(pieceId) => boardLogic.setters.setSelectedPieceId(pieceId)}
                   selectedPieceId={boardLogic.states.selectedPieceId}
+                  onMoveOption={(pieceId, steps) => {
+                    const piece = gameState.pieces.find(p => p.id === pieceId);
+                    if (piece) {
+                      boardLogic.setters.setAnimatingPiece({
+                        id: pieceId,
+                        path: boardLogic.helpers.getMovementPath(piece.nodeId, steps),
+                        currentIndex: 0
+                      });
+                      boardLogic.setters.setSelectedPieceId(null);
+                    }
+                  }}
                 />
                 <OnboardingTooltip 
                   isVisible={isVisible && gameState.currentTurn === team.id}
