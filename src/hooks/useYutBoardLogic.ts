@@ -155,8 +155,8 @@ export function useYutBoardLogic(
       if (targetPiece && piece.team === targetPiece.team && piece.nodeId === targetPiece.nodeId && !piece.isFinished) {
         const nodeId = animatingPiece.path[animatingPiece.currentIndex];
         
-        // 'goal' 특수 노드 처리
-        if (nodeId === 'goal') return { x: 50, y: 565 }; // GOAL_ZONE 중심 좌표
+        // 'goal' 특수 노드 처리: 출발/골인 지점(n0) 위치로 이동 후 종료
+        if (nodeId === 'goal') return { x: 50, y: 550 }; 
 
         const node = nodeMap.get(nodeId);
         return node ? { x: node.x, y: node.y } : { x: 0, y: 0 };

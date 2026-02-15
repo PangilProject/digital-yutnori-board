@@ -18,7 +18,6 @@ interface YutBoardProps {
 }
 
 const PIECE_RADIUS = 13;
-const GOAL_ZONE = { x: 50, y: 565, w: 60, h: 40 };
 
 const YutBoard = ({ pieces, teams, onMovePiece, currentTurn, logic }: YutBoardProps) => {
   const svgRef = useRef<SVGSVGElement>(null);
@@ -64,29 +63,20 @@ const YutBoard = ({ pieces, teams, onMovePiece, currentTurn, logic }: YutBoardPr
   const handlePointerUp = useCallback(() => {
     if (!drag) return;
     
-    const inGoalZone = drag.currentX >= GOAL_ZONE.x - GOAL_ZONE.w/2 && 
-                      drag.currentX <= GOAL_ZONE.x + GOAL_ZONE.w/2 &&
-                      drag.currentY >= GOAL_ZONE.y - GOAL_ZONE.h/2 &&
-                      drag.currentY <= GOAL_ZONE.y + GOAL_ZONE.h/2;
-    
     const piece = pieces.find(p => p.id === drag.pieceId);
-    const canFinish = piece?.nodeId === 'n0' || piece?.nodeId === 'n15' || piece?.nodeId === 'n10' || piece?.nodeId === 'n24';
+    const nearest = findNearestNode(drag.currentX, drag.currentY);
     
-    if (inGoalZone && piece?.nodeId && canFinish) {
-      onMovePiece(drag.pieceId, null, true);
-    } else {
-      const nearest = findNearestNode(drag.currentX, drag.currentY);
-      if (nearest) {
-        if (piece?.nodeId === null && nearest.id === 'n0') {
-          onMovePiece(drag.pieceId, null);
-        } else {
-          onMovePiece(drag.pieceId, nearest.id);
-        }
+    if (nearest) {
+      if (piece?.nodeId === null && nearest.id === 'n0') {
+        // 처음 출발하는 경우
+        onMovePiece(drag.pieceId, null);
       } else {
-        // 대시보드로 통합되었으므로, 보드 바깥으로 드래그하면 원래 자리(노드)로 복귀하거나 
-        // nodeId가 없는 말(대기중)인 경우 null로 유지
-        onMovePiece(drag.pieceId, piece?.nodeId || null);
+        // 일반 이동
+        onMovePiece(drag.pieceId, nearest.id);
       }
+    } else {
+      // 대시보드로 복귀하거나 원래 위치 유지
+      onMovePiece(drag.pieceId, piece?.nodeId || null);
     }
     setDrag(null);
   }, [drag, onMovePiece, pieces, setDrag]);
@@ -123,10 +113,6 @@ const YutBoard = ({ pieces, teams, onMovePiece, currentTurn, logic }: YutBoardPr
 
         {/* 전통적인 노드들 */}
         {BOARD_NODES.map(node => <YutNode key={node.id} node={node} />)}
-
-        {/* 시각적 🏁 골인 영역 */}
-        <rect x={GOAL_ZONE.x - GOAL_ZONE.w/2} y={GOAL_ZONE.y - GOAL_ZONE.h/2} width={GOAL_ZONE.w} height={GOAL_ZONE.h} rx="8" fill="hsla(145, 70%, 50%, 0.1)" stroke="hsl(145, 70%, 40%)" strokeWidth="2" strokeDasharray="4 3" />
-        <text x={GOAL_ZONE.x} y={GOAL_ZONE.y} textAnchor="middle" dominantBaseline="central" fontSize="10" fontWeight="bold" fill="hsl(145, 80%, 30%)" pointerEvents="none">🏁 꼴인</text>
 
         {/* 상호작용적 캡처(잡기) 시각 효과 */}
         {captureEffect && <CaptureEffectComponent effect={captureEffect} />}
