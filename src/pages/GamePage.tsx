@@ -13,6 +13,7 @@ import CaptureNarrator from '@/components/board/CaptureNarrator';
 import GoalNarrator from '@/components/board/GoalNarrator';
 import { cn } from '@/lib/utils';
 import heroBg from '@/assets/hero-bg.png';
+import { RefreshCcw } from 'lucide-react';
 
 const GamePage = () => {
   const navigate = useNavigate();
@@ -118,17 +119,24 @@ const GamePage = () => {
       
       {/* Header */}
       <div className="max-w-[1600px] mx-auto flex items-center justify-between mb-6 px-2">
-        <div className="flex items-center gap-3">
-          <h1 className="text-2xl md:text-3xl font-black text-foreground tracking-tighter flex items-center gap-2">
-            <span className="text-4xl">🎲</span> 윷놀이 디지털 말판
-          </h1>
-        </div>
-        <div className="flex items-center gap-3">
-          <HelpModal />
-          <Button variant="destructive" size="default" onClick={handleReset} className="font-bold px-6 shadow-[0_0_20px_rgba(239,68,68,0.4)] border border-red-500/50 hover:bg-red-600/80 backdrop-blur-sm">
-            🔄 게임 초기화
-          </Button>
-        </div>
+          <div className="flex items-center gap-3">
+            <span className="text-3xl filter drop-shadow-md">🎲</span>
+            <h1 className="text-2xl font-black tracking-tight text-white/90 drop-shadow-sm">
+              윷놀이 디지털 말판
+            </h1>
+          </div>
+          
+          <div className="flex items-center gap-2">
+            <HelpModal />
+            <Button 
+              variant="ghost"
+              size="sm" 
+              onClick={handleReset}
+              className="gap-2 bg-white/5 text-gray-400 hover:text-white hover:bg-red-500/20 border border-white/5 transition-all text-xs h-10 px-4 rounded-full font-bold backdrop-blur-sm"
+            >
+              <RefreshCcw size={14} /> 게임 초기화
+            </Button>
+          </div>
       </div>
 
       <div className="max-w-[1700px] mx-auto">
