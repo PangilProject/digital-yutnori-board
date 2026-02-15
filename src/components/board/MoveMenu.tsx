@@ -47,11 +47,14 @@ const MoveMenu: React.FC<MoveMenuProps> = ({ pos, onMoveOption }) => {
             {options.map((opt) => (
               <button
                 key={opt.label}
+                onPointerDown={(e) => e.stopPropagation()}
+                onMouseDown={(e) => e.stopPropagation()}
                 onClick={(e) => {
                   e.stopPropagation();
+                  console.log('Move option clicked:', opt.steps); // Debugging
                   onMoveOption(opt.steps);
                 }}
-                className="w-10 h-10 rounded-full text-base font-black flex items-center justify-center text-white shadow-sm hover:scale-110 active:scale-90 transition-transform"
+                className="w-10 h-10 rounded-full text-base font-black flex items-center justify-center text-white shadow-sm hover:scale-110 active:scale-90 transition-transform cursor-pointer pointer-events-auto"
                 style={{ backgroundColor: opt.color }}
               >
                 {opt.label}
