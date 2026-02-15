@@ -145,6 +145,17 @@ export function useGameState() {
           stackIds.includes(p.id) ? { ...p, nodeId: null, isFinished: true } : p
         );
         teamStats.finishedCount += stackCount;
+
+        // 골인 내레이터 트리거
+        const teamName = team?.name || piece.team;
+        setGameState(s => s ? {
+          ...s,
+          lastGoal: {
+            teamName,
+            count: stackCount,
+            id: `goal-${Date.now()}-${pieceId}`
+          }
+        } : s);
       } else {
         // 일반 이동 및 잡기 처리
         updatedPieces = updatedPieces.map(p =>

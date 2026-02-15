@@ -57,6 +57,12 @@ export interface GameState {
     count: number;
     id: string; // 애니메이션 트리거를 위한 고유 ID
   } | null;
+  /** 최근 발생한 골인 이벤트 정보 */
+  lastGoal?: {
+    teamName: string;
+    count: number;
+    id: string; // 애니메이션 트리거를 위한 고유 ID
+  } | null;
 }
 
 export const TEAM_PRESETS: { color: string; colorLight: string; emoji: string; defaultName: string }[] = [
