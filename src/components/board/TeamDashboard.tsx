@@ -107,23 +107,25 @@ export const TeamDashboard = ({
 
                   {/* Dashboard Tulip Menu (MoveMenu) */}
                   {selectedPieceId === p.id && isCurrentTurn && (
-                    <div className="absolute bottom-[calc(100%+8px)] left-1/2 -translate-x-1/2 z-[50] animate-in fade-in zoom-in slide-in-from-bottom-2 duration-200 pointer-events-auto">
-                      <div className="bg-white p-1 rounded-xl shadow-2xl border-2 border-primary/20 flex gap-1 whitespace-nowrap min-w-[180px] justify-center backdrop-blur-md bg-white/95">
-                        {moveOptions.map((opt) => (
-                          <button
-                            key={opt.label}
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              onMoveOption?.(p.id, opt.steps);
-                            }}
-                            className="w-7 h-7 rounded-full text-[10px] font-black flex items-center justify-center text-white shadow-sm hover:scale-110 active:scale-90 transition-transform"
-                            style={{ backgroundColor: opt.color }}
-                          >
-                            {opt.label}
-                          </button>
-                        ))}
-                        {/* Arrow */}
-                        <div className="absolute top-[100%] left-1/2 -translate-x-1/2 w-0 h-0 border-l-[6px] border-l-transparent border-r-[6px] border-r-transparent border-t-[6px] border-t-white/95" />
+                    <div className="absolute bottom-[calc(100%+8px)] left-1/2 -translate-x-1/2 z-[50] pointer-events-auto">
+                      <div className="animate-in fade-in zoom-in slide-in-from-bottom-2 duration-200">
+                        <div className="bg-white p-1 rounded-xl shadow-2xl border-2 border-primary/20 flex gap-1 whitespace-nowrap min-w-[180px] justify-center backdrop-blur-md bg-white/95">
+                          {moveOptions.map((opt) => (
+                            <button
+                              key={opt.label}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                onMoveOption?.(p.id, opt.steps);
+                              }}
+                              className="w-7 h-7 rounded-full text-[10px] font-black flex items-center justify-center text-white shadow-sm hover:scale-110 active:scale-90 transition-transform"
+                              style={{ backgroundColor: opt.color }}
+                            >
+                              {opt.label}
+                            </button>
+                          ))}
+                          {/* Arrow */}
+                          <div className="absolute top-[100%] left-1/2 -translate-x-1/2 w-0 h-0 border-l-[6px] border-l-transparent border-r-[6px] border-r-transparent border-t-[6px] border-t-white/95" />
+                        </div>
                       </div>
                     </div>
                   )}
