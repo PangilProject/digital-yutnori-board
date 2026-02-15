@@ -94,6 +94,6 @@ All colors MUST be HSL.
 
   body {
     @apply bg-background text-foreground;
-    font-family: "Jua", sans-serif;
+    font-family: "Gowun Dodum", sans-serif;
   }
 }

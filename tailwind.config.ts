@@ -14,7 +14,7 @@ export default {
     },
     extend: {
       fontFamily: {
-        sans: ["Jua", "sans-serif"],
+        sans: ["Gowun Dodum", "sans-serif"],
       },
       colors: {
         border: "hsl(var(--border))",
