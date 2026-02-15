@@ -173,13 +173,13 @@ const GamePage = () => {
           </div>
       </div>
 
-      <div className="max-w-[1700px] mx-auto">
+      <div className="max-w-[1600px] mx-auto">
         {/* Main Grid Layout: 2 Columns on PC/Tablet */}
-        <div className="grid grid-cols-1 lg:grid-cols-[1fr_360px] xl:grid-cols-[1fr_380px] gap-6 lg:gap-8 items-start">
+        <div className="grid grid-cols-1 lg:grid-cols-[1fr_460px] xl:grid-cols-[1fr_480px] gap-6 lg:gap-8 items-start">
           
           {/* Main Area: Yut Board */}
           <div className="relative flex-1 flex flex-col items-center order-1 w-full">
-            <div className="relative w-full max-w-[800px] lg:max-w-[1000px] bg-white/5 p-4 md:p-6 lg:p-8 rounded-[2.5rem] md:rounded-[3rem] shadow-[0_0_50px_rgba(0,0,0,0.5)] border border-white/10 backdrop-blur-md">
+            <div className="relative w-full max-w-[600px] lg:max-w-[700px] bg-white/5 p-4 md:p-6 lg:p-8 rounded-[2rem] md:rounded-[2.5rem] shadow-[0_0_40px_rgba(0,0,0,0.5)] border border-white/10 backdrop-blur-md">
               <YutBoard
                 pieces={gameState.pieces}
                 teams={gameState.teams}
