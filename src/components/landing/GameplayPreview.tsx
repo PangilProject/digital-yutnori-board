@@ -8,6 +8,8 @@ import { useYutBoardLogic } from '@/hooks/useYutBoardLogic';
 import { Piece, TeamConfig, TeamId } from '@/types/game';
 
 // Preview 전용 더미 데이터
+import CaptureNarrator from '@/components/board/CaptureNarrator';
+
 const PREVIEW_TEAMS: TeamConfig[] = [
   { id: 'team0' as TeamId, name: 'Blue Team', color: '#3b82f6', colorLight: '#dbeafe', emoji: '🔵', pieceCount: 4 },
   { id: 'team1' as TeamId, name: 'Red Team', color: '#ef4444', colorLight: '#fee2e2', emoji: '🔴', pieceCount: 4 },
@@ -27,16 +29,55 @@ export const GameplayPreview = () => {
   const svgRef = useRef<SVGSVGElement>(null);
   const navigate = useNavigate();
 
+  const [lastCapture, setLastCapture] = useState<{capturingTeam: string, capturedTeam: string, count: number, id: string} | null>(null);
+  
   // 실제 게임 로직 훅을 프리뷰 데이터로 초기화
   const handleMovePiece = (pieceId: string, targetNodeId: string | null, isGoalMove?: boolean) => {
     if (isDemoEnded) return;
-    setPieces(prev => prev.map(p => {
-      if (p.id === pieceId) {
-        if (isGoalMove) return { ...p, nodeId: null, isFinished: true };
-        return { ...p, nodeId: targetNodeId };
+
+    setPieces(prev => {
+      const movedPiece = prev.find(p => p.id === pieceId);
+      if (!movedPiece) return prev;
+
+      // 1. 이동 처리
+      let newPieces = prev.map(p => {
+        if (p.id === pieceId) {
+          if (isGoalMove) return { ...p, nodeId: null, isFinished: true };
+          return { ...p, nodeId: targetNodeId };
+        }
+        return p;
+      });
+
+      // 2. 잡기 처리 (일반 이동일 때만)
+      if (targetNodeId && !isGoalMove) {
+        const opponentPieces = newPieces.filter(p => 
+          p.nodeId === targetNodeId && 
+          p.team !== movedPiece.team && 
+          !p.isFinished
+        );
+
+        if (opponentPieces.length > 0) {
+          // 잡힌 말들 대기소로 보내기
+          newPieces = newPieces.map(p => 
+            opponentPieces.some(op => op.id === p.id) ? { ...p, nodeId: null } : p
+          );
+          
+          // 이펙트 트리거
+          const capturedTeamId = opponentPieces[0].team;
+          const capturingTeam = PREVIEW_TEAMS.find(t => t.id === movedPiece.team);
+          const capturedTeam = PREVIEW_TEAMS.find(t => t.id === capturedTeamId);
+          
+          setLastCapture({
+            capturingTeam: capturingTeam?.name || 'Blue Team',
+            capturedTeam: capturedTeam?.name || 'Red Team',
+            count: opponentPieces.length,
+            id: `preview-capture-${Date.now()}`
+          });
+        }
       }
-      return p;
-    }));
+
+      return newPieces;
+    });
   };
 
   const logic = useYutBoardLogic(pieces, PREVIEW_TEAMS, handleMovePiece, currentTurn);
@@ -51,7 +92,7 @@ export const GameplayPreview = () => {
         <div className="p-4 rounded-2xl bg-white/5 border border-white/10 backdrop-blur-md mb-2">
           <p className="text-xs font-bold text-blue-400 uppercase tracking-widest mb-1">Interactive Demo</p>
           <p className="text-sm text-gray-400 font-medium leading-relaxed">
-            아래 대시보드에서 말을 꺼내 보드판으로 직접 드래그해보세요! 
+            아래 대시보드에서 말을 꺼내 보드판으로 직접 드래그해보세요! <span className="text-white font-bold">파란말</span>로 <span className="text-red-400 font-bold">빨간말</span>을 잡아보세요.
           </p>
         </div>
         
@@ -126,6 +167,13 @@ export const GameplayPreview = () => {
                 한 번 더 체험하기
               </button>
             </div>
+          </div>
+        )}
+        
+        {/* Capture Effect Overlay for Preview */}
+        {lastCapture && (
+          <div className="absolute inset-0 z-40 pointer-events-none">
+            <CaptureNarrator {...lastCapture} />
           </div>
         )}
       </div>
