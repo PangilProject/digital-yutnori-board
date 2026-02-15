@@ -20,7 +20,7 @@ export const initGA = () => {
     ReactGA.initialize(GA_MEASUREMENT_ID, { 
       testMode: IS_DEV // 로컬 개발 환경에서 테스트 모드로 설정 (콘솔 로그 등)
     });
-    console.log(`GA4 Initialized with ID: ${GA_MEASUREMENT_ID} (Mode: ${IS_DEV ? 'Dev' : 'Prod'})`);
+    // console.log(`GA4 Initialized with ID: ${GA_MEASUREMENT_ID} (Mode: ${IS_DEV ? 'Dev' : 'Prod'})`);
   } else {
     console.warn("GA4 Measurement ID is missing!");
   }
