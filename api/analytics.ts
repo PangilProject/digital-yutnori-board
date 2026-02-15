@@ -39,10 +39,10 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       throw new Error('GA4_PROPERTY_ID is not set');
     }
 
-    // Set Cache-Control header for 10 minutes (600 seconds)
-    // s-maxage=600 tells Vercel's edge cache to hold it for 10 min
+    // Set Cache-Control header for 1 minute (60 seconds)
+    // s-maxage=60 tells Vercel's edge cache to hold it for 1 min
     // stale-while-revalidate=30 allows serving stale content while updating in background
-    res.setHeader('Cache-Control', 's-maxage=600, stale-while-revalidate=30');
+    res.setHeader('Cache-Control', 's-maxage=60, stale-while-revalidate=30');
 
     // Run batch report for optimization (single API call)
     const [response] = await analyticsDataClient.batchRunReports({
