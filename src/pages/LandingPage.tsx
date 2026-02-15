@@ -166,7 +166,7 @@ const LandingPage = () => {
           <Button 
             variant="outline"
             onClick={() => navigate('/setup')} 
-            className="rounded-xl border-white/10 hover:bg-white/10 hover:text-white px-8 h-12 font-bold"
+            className="rounded-xl border-white/10 hover:bg-white/10 hover:text-white px-8 h-12 font-bold text-black/50"
           >
             지금 체험해보기
           </Button>
