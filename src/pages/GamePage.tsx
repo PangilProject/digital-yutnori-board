@@ -174,12 +174,12 @@ const GamePage = () => {
       </div>
 
       <div className="max-w-[1600px] mx-auto">
-        {/* Main Grid Layout: 2 Columns on PC/Tablet */}
-        <div className="grid grid-cols-1 lg:grid-cols-[1fr_460px] xl:grid-cols-[1fr_480px] gap-6 lg:gap-8 items-start">
+        {/* Main Grid Layout: 2 Columns on PC/Tablet. Adjusted sidebar width for multi-column dashboards */}
+        <div className="grid grid-cols-1 lg:grid-cols-[1fr_520px] xl:grid-cols-[1fr_560px] gap-4 lg:gap-8 items-center h-full">
           
           {/* Main Area: Yut Board */}
-          <div className="relative flex-1 flex flex-col items-center order-1 w-full">
-            <div className="relative w-full max-w-[600px] lg:max-w-[700px] bg-white/5 p-4 md:p-6 lg:p-8 rounded-[2rem] md:rounded-[2.5rem] shadow-[0_0_40px_rgba(0,0,0,0.5)] border border-white/10 backdrop-blur-md">
+          <div className="relative flex-1 flex flex-col items-center justify-center order-1 w-full h-full overflow-hidden">
+            <div className="relative w-full max-w-[500px] lg:max-w-[650px] bg-white/5 p-4 md:p-6 lg:p-8 rounded-[2rem] md:rounded-[2.5rem] shadow-[0_0_40px_rgba(0,0,0,0.5)] border border-white/10 backdrop-blur-md shrink-0">
               <YutBoard
                 pieces={gameState.pieces}
                 teams={gameState.teams}
@@ -207,13 +207,25 @@ const GamePage = () => {
                 />
               </div>
             </div>
-            
-
           </div>
 
           {/* Sidebar Area: All Team Dashboards */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:flex lg:flex-col gap-3 md:gap-4 order-2 w-full">
-            <div className="mb-0 px-2 lg:mb-2 md:col-span-2 lg:col-span-1">
+          {/* Mobile/Tablet Portrait: Grid 1 or 2 cols (already set). Desktop Sidebar: Grid 1 or 2 cols depending on team count */}
+          <div 
+            className={cn(
+              "grid gap-3 md:gap-4 order-2 w-full max-h-full overflow-y-auto pr-2 custom-scrollbar content-start",
+              // Mobile/Tablet
+              "grid-cols-1 md:grid-cols-2",
+              // Desktop Sidebar - Conditional Grid
+              gameState.teams.length >= 3 ? "lg:grid-cols-2" : "lg:grid-cols-1"
+            )}
+          >
+            <div className={cn(
+              "mb-0 px-2 lg:mb-2 shrink-0",
+              // Span 2 columns if in grid mode and we want header to be full width? 
+              // Or just let it take one slot? Let's make it full width if 2 cols.
+              gameState.teams.length >= 3 ? "col-span-1 md:col-span-2 lg:col-span-2" : "col-span-1 md:col-span-2 lg:col-span-1"
+            )}>
               <h2 className="text-sm font-black text-gray-400 uppercase tracking-widest flex items-center gap-2">
                 <div className="w-2 h-2 rounded-full bg-blue-500 animate-pulse shadow-[0_0_10px_#3b82f6]" />
                 Team Status
