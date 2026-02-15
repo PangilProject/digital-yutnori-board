@@ -166,6 +166,8 @@ export function useGameState() {
       }
 
       let updatedPieces = [...prev.pieces];
+      let newLastGoal = prev.lastGoal;
+      let newLastCapture = prev.lastCapture;
 
       if (isGoalMove) {
         // 골인 처리
@@ -176,14 +178,11 @@ export function useGameState() {
 
         // 골인 내레이터 트리거
         const teamName = team?.name || piece.team;
-        setGameState(s => s ? {
-          ...s,
-          lastGoal: {
-            teamName,
-            count: stackCount,
-            id: `goal-${Date.now()}-${pieceId}`
-          }
-        } : s);
+        newLastGoal = {
+          teamName,
+          count: stackCount,
+          id: `goal-${Date.now()}-${pieceId}`
+        };
       } else {
         // 일반 이동 및 잡기 처리
         updatedPieces = updatedPieces.map(p =>
@@ -210,19 +209,16 @@ export function useGameState() {
                 capture_count: count
               });
               
-              // 대형 포획 내레이터 트리거
+              // 대형 포획 내레이터 트리거 (마지막 잡은 팀 기준)
               const capturingTeamName = team?.name || piece.team;
               const capturedTeamName = capturedTeam?.name || capturedTeamId;
               
-              setGameState(s => s ? {
-                ...s,
-                lastCapture: {
-                  capturingTeam: capturingTeamName,
-                  capturedTeam: capturedTeamName,
-                  count,
-                  id: `${Date.now()}-${pieceId}`
-                }
-              } : s);
+              newLastCapture = {
+                capturingTeam: capturingTeamName,
+                capturedTeam: capturedTeamName,
+                count,
+                id: `${Date.now()}-${pieceId}`
+              };
             });
             updatedPieces = updatedPieces.map(p =>
               opponentPieces.some(cp => cp.id === p.id) ? { ...p, nodeId: null } : p
@@ -253,6 +249,8 @@ export function useGameState() {
         pieces: updatedPieces, 
         logs, 
         stats: nextStats,
+        lastGoal: newLastGoal,
+        lastCapture: newLastCapture,
         winnerId
       };
     });
