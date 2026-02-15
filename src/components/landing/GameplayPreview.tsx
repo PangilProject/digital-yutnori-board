@@ -107,6 +107,8 @@ export const GameplayPreview = () => {
             if (isDemoEnded) return;
             const path = logic.helpers.getMovementPath(pieces.find(p => p.id === id)?.nodeId || null, steps);
             logic.setters.setAnimatingPiece({ id, path, currentIndex: 0 });
+            // Ensure any lingering drag state is cleared
+            logic.setters.setDrag(null);
           }}
           onDragStart={(id, e) => {
             if (isDemoEnded) return;

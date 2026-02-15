@@ -250,6 +250,8 @@ const GamePage = () => {
                         path: boardLogic.helpers.getMovementPath(piece.nodeId, steps),
                         currentIndex: 0
                       });
+                      // Ensure any lingering drag state is cleared
+                      boardLogic.setters.setDrag(null);
                     }
                     boardLogic.setters.setSelectedPieceId(null);
                   }}

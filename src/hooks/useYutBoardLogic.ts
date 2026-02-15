@@ -74,7 +74,8 @@ export function useYutBoardLogic(
         } else {
           onMovePiece(animatingPiece.id, finalNodeId);
         }
-        setAnimatingPiece(null);
+        // State update race condition fix: wait for parent state to update before clearing animation
+        setTimeout(() => setAnimatingPiece(null), 100);
       }
     }, 250);
 
