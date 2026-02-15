@@ -208,10 +208,7 @@ const GamePage = () => {
               </div>
             </div>
             
-            {/* Legend or subtle info */}
-            <p className="mt-8 text-xs font-black text-gray-600 uppercase tracking-[0.3em] opacity-50">
-              Traditional Strategy Digital Board • 윷놀이
-            </p>
+
           </div>
 
           {/* Sidebar Area: All Team Dashboards */}
@@ -276,6 +273,13 @@ const GamePage = () => {
           </div>
 
         </div>
+      </div>
+
+      {/* Footer Legend */}
+      <div className="mt-12 mb-6 text-center pb-8">
+        <p className="text-xs font-black text-gray-600 uppercase tracking-[0.3em] opacity-50">
+          Traditional Strategy Digital Board • 윷놀이
+        </p>
       </div>
 
       {gameState.status === 'first_turn' && (
