@@ -149,10 +149,11 @@ const YutBoard = ({ pieces, teams, onMovePiece, currentTurn, logic, svgRef }: Yu
           ) : null;
         })}
 
-        {/* 이동 툴팁 메뉴 */}
+        {/* 이동 툴팁 메뉴 - 보드판 위에 있는 말만 표시 */}
         {selectedPieceId && !animatingPiece && (() => {
           const piece = pieces.find(p => p.id === selectedPieceId);
-          return piece ? (
+          // nodeId가 없으면(대기 중) 보드판에는 메튜를 띄우지 않음 (대시보드에서 띄움)
+          return piece && piece.nodeId ? (
             <MoveMenu 
               pos={getPiecePosition(piece)} 
               onMoveOption={(steps) => {

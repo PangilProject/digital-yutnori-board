@@ -32,16 +32,18 @@ const MoveMenu: React.FC<MoveMenuProps> = ({ pos, onMoveOption }) => {
   const arrowOffset = pos.x - clampedX;
 
   // 보드 상단(0) 밖으로 나가지 않도록 Y 좌표도 조정
+  // 보드 상단(0) 밖으로 나가지 않도록 Y 좌표도 조정
   const menuY = Math.max(80, pos.y);
 
   return (
-    <g className="animate-in fade-in zoom-in duration-200" transform={`translate(${clampedX}, ${menuY - 45})`}>
-      {/* 반투명한 흰색 배경 (Glassmorphism 느낌) */}
-      <rect x={-halfWidth} y="-30" width={menuWidth} height="60" rx="12" fill="white" filter="url(#nodeShadow)" fillOpacity="0.95" />
-      {/* 가리키는 화살표 - 실제 말 위치로 오프셋 적용 */}
-      <path d={`M ${arrowOffset - 8} 30 L ${arrowOffset} 38 L ${arrowOffset + 8} 30 Z`} fill="white" fillOpacity="0.95" />
-      
-      {options.map((opt, i) => (
+    <g transform={`translate(${clampedX}, ${menuY - 45})`}>
+      <g className="animate-in fade-in zoom-in duration-200">
+        {/* 반투명한 흰색 배경 (Glassmorphism 느낌) */}
+        <rect x={-halfWidth} y="-30" width={menuWidth} height="60" rx="12" fill="white" filter="url(#nodeShadow)" fillOpacity="0.95" />
+        {/* 가리키는 화살표 - 실제 말 위치로 오프셋 적용 */}
+        <path d={`M ${arrowOffset - 8} 30 L ${arrowOffset} 38 L ${arrowOffset + 8} 30 Z`} fill="white" fillOpacity="0.95" />
+        
+        {options.map((opt, i) => (
         <g 
           key={opt.label} 
           transform={`translate(${-95 + i * 38}, 0)`} 
@@ -77,6 +79,7 @@ const MoveMenu: React.FC<MoveMenuProps> = ({ pos, onMoveOption }) => {
           </text>
         </g>
       ))}
+      </g>
     </g>
   );
 };
