@@ -6,6 +6,8 @@ import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { initializeGame } from '@/hooks/useGameState';
 import { TeamConfig, TeamId, TEAM_PRESETS, getRandomTeamName } from '@/types/game';
+import { cn } from '@/lib/utils';
+import heroBg from '@/assets/hero-bg.png';
 
 interface TeamSetup {
   name: string;
@@ -51,15 +53,25 @@ const SetupPage = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4"
-      style={{ background: 'linear-gradient(135deg, hsl(35, 45%, 88%) 0%, hsl(25, 40%, 82%) 50%, hsl(35, 35%, 85%) 100%)' }}>
-      <Card className="w-full max-w-lg shadow-2xl border-2 border-border relative">
+    <div className="relative min-h-screen w-full flex items-center justify-center overflow-hidden bg-slate-950 text-white selection:bg-blue-500/30">
+      {/* Background Image with Layered Overlays */}
+      <div className="absolute inset-0 z-0">
+        <img 
+          src={heroBg} 
+          alt="Yutnori Background" 
+          className="w-full h-full object-cover opacity-40"
+        />
+        <div className="absolute inset-0 bg-gradient-to-b from-slate-950/80 via-transparent to-slate-950" />
+        <div className="absolute inset-0 bg-gradient-to-r from-slate-950 via-slate-950/20 to-slate-950/40" />
+      </div>
+
+      <Card className="w-full max-w-lg shadow-2xl border border-white/10 relative z-10 bg-black/40 backdrop-blur-md text-white">
         <div className="absolute top-4 left-4 z-20">
           <Button 
             variant="ghost" 
             size="sm" 
             onClick={() => navigate('/')}
-            className="text-muted-foreground hover:text-foreground flex items-center gap-1"
+            className="text-white/50 hover:text-white hover:bg-white/10 flex items-center gap-1"
           >
             ← 홈으로
           </Button>
@@ -68,9 +80,9 @@ const SetupPage = () => {
           <HelpModal />
         </div>
         <CardHeader className="text-center pb-4">
-          <div className="text-5xl mb-2">🎲</div>
-          <CardTitle className="text-3xl font-extrabold tracking-tight text-foreground">게임 설정</CardTitle>
-          <p className="text-muted-foreground mt-1">함께 즐길 팀과 규칙을 정해봅시다</p>
+          <div className="text-5xl mb-2 drop-shadow-md">🎲</div>
+          <CardTitle className="text-3xl font-extrabold tracking-tight text-white">게임 설정</CardTitle>
+          <p className="text-gray-400 mt-1">함께 즐길 팀과 규칙을 정해봅시다</p>
         </CardHeader>
         <CardContent className="space-y-5">
           {/* Team count selector */}
@@ -86,8 +98,8 @@ const SetupPage = () => {
                   }}
                   className={`w-10 h-10 rounded-full font-bold text-lg transition-all ${
                     teamCount === n
-                      ? 'bg-foreground text-background shadow-lg scale-110'
-                      : 'bg-secondary text-secondary-foreground hover:bg-accent'
+                      ? 'bg-blue-500 text-white shadow-[0_0_15px_rgba(59,130,246,0.5)] scale-110'
+                      : 'bg-white/10 text-gray-400 hover:bg-white/20'
                   }`}
                 >
                   {n}
@@ -130,12 +142,12 @@ const SetupPage = () => {
                         value={teamSetups[i].name}
                         onChange={e => updateTeam(i, 'name', e.target.value)}
                         placeholder={`${preset.defaultName}`}
-                        className="mt-0.5 h-8 text-sm"
+                        className="mt-0.5 h-8 text-sm bg-black/20 border-white/10 text-white placeholder:text-white/20 focus:border-white/30"
                       />
                     </div>
                     <div>
-                      <Label className="text-[10px] text-muted-foreground uppercase font-bold tracking-wider">
-                        말 개수: <span className="font-bold text-foreground">{teamSetups[i].pieceCount}개</span>
+                      <Label className="text-[10px] text-gray-400 uppercase font-bold tracking-wider">
+                        말 개수: <span className="font-bold text-white">{teamSetups[i].pieceCount}개</span>
                       </Label>
                       <input
                         type="range"
@@ -143,7 +155,7 @@ const SetupPage = () => {
                         max={5}
                         value={teamSetups[i].pieceCount}
                         onChange={e => updateTeam(i, 'pieceCount', Number(e.target.value))}
-                        className="w-full mt-0.5 accent-current"
+                        className="w-full mt-0.5 accent-current cursor-pointer"
                         style={{ accentColor: preset.color }}
                       />
                     </div>
@@ -163,7 +175,7 @@ const SetupPage = () => {
             />
           </div>
 
-          <Button onClick={handleStart} className="w-full text-lg h-12 font-bold" size="lg">
+          <Button onClick={handleStart} className="w-full text-lg h-12 font-bold bg-blue-600 hover:bg-blue-500 text-white shadow-[0_0_20px_rgba(37,99,235,0.3)] border-0" size="lg">
             🎮 게임 시작!
           </Button>
         </CardContent>

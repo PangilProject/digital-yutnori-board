@@ -11,6 +11,8 @@ import { OnboardingTooltip } from '@/components/board/OnboardingTooltip';
 import { useYutBoardLogic } from '@/hooks/useYutBoardLogic';
 import CaptureNarrator from '@/components/board/CaptureNarrator';
 import GoalNarrator from '@/components/board/GoalNarrator';
+import { cn } from '@/lib/utils';
+import heroBg from '@/assets/hero-bg.png';
 
 const GamePage = () => {
   const navigate = useNavigate();
@@ -100,8 +102,19 @@ const GamePage = () => {
   };
 
   return (
-    <div className="min-h-screen p-3 md:p-6 lg:p-10"
-      style={{ background: 'linear-gradient(180deg, hsl(35, 45%, 94%) 0%, hsl(30, 35%, 88%) 100%)' }}>
+    <div className="relative min-h-screen w-full overflow-hidden bg-slate-950 text-white selection:bg-blue-500/30">
+      {/* Background Image with Layered Overlays */}
+      <div className="absolute inset-0 z-0">
+        <img 
+          src={heroBg} 
+          alt="Yutnori Background" 
+          className="w-full h-full object-cover opacity-30 scale-105"
+        />
+        <div className="absolute inset-0 bg-gradient-to-b from-slate-950/90 via-slate-950/50 to-slate-950/90" />
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-blue-900/20 via-slate-950/0 to-slate-950/40" />
+      </div>
+
+      <div className="relative z-10 p-3 md:p-6 lg:p-10">
       
       {/* Header */}
       <div className="max-w-[1600px] mx-auto flex items-center justify-between mb-6 px-2">
@@ -112,7 +125,7 @@ const GamePage = () => {
         </div>
         <div className="flex items-center gap-3">
           <HelpModal />
-          <Button variant="destructive" size="default" onClick={handleReset} className="font-bold px-6 shadow-lg shadow-destructive/20 border-2 border-destructive/10">
+          <Button variant="destructive" size="default" onClick={handleReset} className="font-bold px-6 shadow-[0_0_20px_rgba(239,68,68,0.4)] border border-red-500/50 hover:bg-red-600/80 backdrop-blur-sm">
             🔄 게임 초기화
           </Button>
         </div>
@@ -124,7 +137,7 @@ const GamePage = () => {
           
           {/* Main Area: Yut Board */}
           <div className="relative flex-1 flex flex-col items-center order-1">
-            <div className="relative w-full max-w-[1000px] bg-white/40 p-4 md:p-8 rounded-[3rem] shadow-inner-lg border-2 border-white/30 backdrop-blur-sm">
+            <div className="relative w-full max-w-[1000px] bg-white/5 p-4 md:p-8 rounded-[3rem] shadow-[0_0_50px_rgba(0,0,0,0.5)] border border-white/10 backdrop-blur-md">
               <YutBoard
                 pieces={gameState.pieces}
                 teams={gameState.teams}
@@ -154,7 +167,7 @@ const GamePage = () => {
             </div>
             
             {/* Legend or subtle info */}
-            <p className="mt-8 text-xs font-black text-muted-foreground uppercase tracking-[0.3em] opacity-30">
+            <p className="mt-8 text-xs font-black text-gray-600 uppercase tracking-[0.3em] opacity-50">
               Traditional Strategy Digital Board • 윷놀이
             </p>
           </div>
@@ -162,8 +175,8 @@ const GamePage = () => {
           {/* Sidebar Area: All Team Dashboards */}
           <div className="flex flex-col gap-5 order-2">
             <div className="mb-2 px-2">
-              <h2 className="text-sm font-black text-muted-foreground uppercase tracking-widest flex items-center gap-2">
-                <div className="w-2 h-2 rounded-full bg-primary animate-pulse" />
+              <h2 className="text-sm font-black text-gray-400 uppercase tracking-widest flex items-center gap-2">
+                <div className="w-2 h-2 rounded-full bg-blue-500 animate-pulse shadow-[0_0_10px_#3b82f6]" />
                 Team Status
               </h2>
             </div>
@@ -245,6 +258,7 @@ const GamePage = () => {
           onHome={handleHome} 
         />
       )}
+      </div>
     </div>
   );
 };

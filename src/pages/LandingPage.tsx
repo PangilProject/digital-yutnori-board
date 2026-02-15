@@ -108,7 +108,7 @@ const LandingPage = () => {
               <button 
                 className="h-14 px-8 text-white/70 hover:text-white font-semibold transition-colors flex items-center gap-2"
                 onClick={() => {
-                  const featuresEl = document.getElementById('features');
+                  const featuresEl = document.getElementById('live-experience');
                   featuresEl?.scrollIntoView({ behavior: 'smooth' });
                 }}
               >
@@ -121,7 +121,8 @@ const LandingPage = () => {
       </section>
 
       {/* Gameplay Showcase Section (Live Preview) */}
-      <section className="relative z-10 w-full max-w-7xl px-6 py-20 overflow-visible">
+      {/* Gameplay Showcase Section (Live Preview) */}
+      <section id="live-experience" className="relative z-10 w-full max-w-6xl px-6 py-32 border-t border-white/5 overflow-visible">
         <div className="text-center mb-16">
           <div className="flex items-center justify-center gap-2 text-blue-400 mb-4">
             <MousePointerClick className="w-5 h-5" />
@@ -140,7 +141,6 @@ const LandingPage = () => {
       </section>
 
       {/* Visual Impact Showcase Section */}
-      <section className="relative z-10 w-full max-w-6xl px-6 py-20 border-t border-white/5 bg-gradient-to-b from-transparent to-blue-900/10">
       <section className="relative z-10 w-full max-w-6xl px-6 py-20 border-t border-white/5 bg-gradient-to-b from-transparent to-blue-900/10">
         <div className="flex flex-col items-center text-center">
           <div className="flex items-center gap-2 text-amber-400 mb-4">
@@ -186,10 +186,20 @@ const LandingPage = () => {
           />
         )}
       </section>
-      </section>
 
       {/* Features Section */}
       <section id="features" className="relative z-10 w-full max-w-6xl px-6 py-32 border-t border-white/5">
+        <div className="text-center mb-16">
+          <div className="flex items-center justify-center gap-2 text-emerald-400 mb-4">
+            <Trophy className="w-5 h-5" />
+            <span className="text-sm font-bold tracking-widest uppercase">Key Features</span>
+          </div>
+          <h2 className="text-4xl md:text-5xl font-black tracking-tighter mb-6">더 편리하고 <span className="text-emerald-400">스마트한</span> 윷놀이</h2>
+          <p className="text-gray-400 max-w-2xl mx-auto leading-relaxed">
+            복잡한 계산은 맡기고 게임에만 집중하세요.
+          </p>
+        </div>
+
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           {features.map((feature, i) => (
             <div 
@@ -211,8 +221,14 @@ const LandingPage = () => {
       {/* How to Play Section */}
       <section className="relative z-10 w-full max-w-6xl px-6 py-32 bg-gradient-to-b from-transparent via-blue-500/5 to-transparent">
         <div className="text-center mb-20">
-          <h2 className="text-4xl md:text-5xl font-black tracking-tight mb-4">How to Play</h2>
-          <p className="text-gray-400">간단한 3단계를 통해 디지털 윷놀이를 즐겨보세요.</p>
+          <div className="flex items-center justify-center gap-2 text-blue-400 mb-4">
+            <PlayCircle className="w-5 h-5" />
+            <span className="text-sm font-bold tracking-widest uppercase">Game Guide</span>
+          </div>
+          <h2 className="text-4xl md:text-5xl font-black tracking-tighter mb-6">How to <span className="text-blue-400">Play</span></h2>
+          <p className="text-gray-400 max-w-2xl mx-auto leading-relaxed">
+            간단한 3단계를 통해 디지털 윷놀이를 즐겨보세요.
+          </p>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-12 relative">
