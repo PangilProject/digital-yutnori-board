@@ -22,65 +22,50 @@ const MoveMenu: React.FC<MoveMenuProps> = ({ pos, onMoveOption }) => {
     { label: '빽', steps: -1, color: 'hsl(0, 0%, 40%)' },
   ];
 
-  // 메뉴가 보드판(0~600) 밖으로 나가지 않도록 X 좌표를 제한 (메뉴 너비 약 240)
-  const menuWidth = 240;
+  // 메뉴가 보드판(0~600) 밖으로 나가지 않도록 X 좌표를 제한 (메뉴 너비 약 320)
+  const menuWidth = 320;
+  const menuHeight = 80;
   const halfWidth = menuWidth / 2;
   const margin = 10; // 최소 여백
-  const clampedX = Math.min(Math.max(halfWidth + margin, pos.x), 600 - halfWidth - margin);
   
-  // 말 위치가 구석일 때 메뉴 박스가 밀리더라도 화살표는 말을 가리키도록 오프셋 계산
-  const arrowOffset = pos.x - clampedX;
+  // foreignObject는 좌상단 좌표 기준이므로 중심 보정을 위해 x - halfWidth
+  const clampedX = Math.min(Math.max(halfWidth + margin, pos.x), 600 - halfWidth - margin);
+  const x = clampedX - halfWidth;
+  
+  // 말 위치가 구석일 때 메뉴 박스가 밀리더라도 화살표는 말을 가리키도록 오프셋 계산 (HTML 내부에서 처리하거나 근사치 사용)
+  const arrowOffset = pos.x - clampedX; // 중심점으로부터의 거리
 
   // 보드 상단(0) 밖으로 나가지 않도록 Y 좌표도 조정
-  // 보드 상단(0) 밖으로 나가지 않도록 Y 좌표도 조정
-  const menuY = Math.max(80, pos.y);
+  const menuY = Math.max(90, pos.y);
+  const y = menuY - 100; // 말 위쪽으로 띄움
 
   return (
-    <g transform={`translate(${clampedX}, ${menuY - 45})`}>
-      <g className="animate-in fade-in zoom-in duration-200">
-        {/* 반투명한 흰색 배경 (Glassmorphism 느낌) */}
-        <rect x={-halfWidth} y="-30" width={menuWidth} height="60" rx="12" fill="white" filter="url(#nodeShadow)" fillOpacity="0.95" />
-        {/* 가리키는 화살표 - 실제 말 위치로 오프셋 적용 */}
-        <path d={`M ${arrowOffset - 8} 30 L ${arrowOffset} 38 L ${arrowOffset + 8} 30 Z`} fill="white" fillOpacity="0.95" />
-        
-        {options.map((opt, i) => (
-        <g 
-          key={opt.label} 
-          transform={`translate(${-95 + i * 38}, 0)`} 
-          style={{ cursor: 'pointer' }}
-          onPointerDown={(e) => e.stopPropagation()} // 클릭 시 선택된 말이 해제되지 않도록 전파 중단
-          onClick={(e) => {
-            e.stopPropagation();
-            onMoveOption(opt.steps);
-          }}
-        >
-          {/* 각 이동 옵션을 나타내는 원형 버튼 */}
-          <circle r="14" fill={opt.color} className="hover:filter hover:brightness-110 transition-all" />
-          <text 
-            textAnchor="middle" 
-            dominantBaseline="central" 
-            fontSize="12" 
-            fontWeight="bold" 
-            fill="white"
-            pointerEvents="none"
-          >
-            {opt.label}
-          </text>
-          {/* 하단에 표시되는 작은 이동 수 지표 (예: +3) */}
-          <text
-            y="20"
-            textAnchor="middle"
-            fontSize="8"
-            fill="hsl(0, 0%, 40%)"
-            fontWeight="bold"
-            pointerEvents="none"
-          >
-            {opt.steps > 0 ? `+${opt.steps}` : opt.steps}
-          </text>
-        </g>
-      ))}
-      </g>
-    </g>
+    <foreignObject x={x} y={y} width={menuWidth} height={menuHeight + 20} className="overflow-visible">
+      <div className="relative w-full h-full flex flex-col items-center justify-end pb-2">
+        <div className="animate-in fade-in zoom-in-95 duration-200 origin-bottom">
+          <div className="bg-white p-2 rounded-xl shadow-2xl border-2 border-primary/20 flex gap-2 whitespace-nowrap min-w-[220px] justify-center backdrop-blur-md bg-white/95">
+            {options.map((opt) => (
+              <button
+                key={opt.label}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onMoveOption(opt.steps);
+                }}
+                className="w-10 h-10 rounded-full text-base font-black flex items-center justify-center text-white shadow-sm hover:scale-110 active:scale-90 transition-transform"
+                style={{ backgroundColor: opt.color }}
+              >
+                {opt.label}
+              </button>
+            ))}
+          </div>
+          {/* Arrow pointing to piece */}
+          <div 
+            className="absolute top-[calc(100%-8px)] w-0 h-0 border-l-[8px] border-l-transparent border-r-[8px] border-r-transparent border-t-[8px] border-t-white/95 filter drop-shadow-sm" 
+            style={{ left: `calc(50% + ${arrowOffset}px)`, transform: 'translateX(-50%)' }}
+          />
+        </div>
+      </div>
+    </foreignObject>
   );
 };
 
