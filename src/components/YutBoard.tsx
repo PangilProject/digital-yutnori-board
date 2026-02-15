@@ -27,6 +27,9 @@ const YutBoard = ({ pieces, teams, onMovePiece, currentTurn, logic, svgRef }: Yu
   const { pieceGroups, teamMap, nodeMap } = memos;
   const { clientToSVG, getPiecePosition, getMovementPath } = helpers;
 
+  // 드래그 시작 위치를 추적하기 위한 ref (클릭 vs 드래그 구분용)
+  const dragStartRef = useRef<{ x: number, y: number } | null>(null);
+
   const handlePointerDown = useCallback((e: React.PointerEvent, pieceId: string) => {
     const piece = pieces.find(p => p.id === pieceId);
     if (piece?.isFinished || animatingPiece) return;
@@ -42,9 +45,11 @@ const YutBoard = ({ pieces, teams, onMovePiece, currentTurn, logic, svgRef }: Yu
     (e.target as Element).setPointerCapture(e.pointerId);
     
     const pos = clientToSVG(e.clientX, e.clientY, svgRef.current);
+    dragStartRef.current = { x: pos.x, y: pos.y }; // 시작 위치 저장
     setDrag({ pieceId, currentX: pos.x, currentY: pos.y });
 
     const handleUp = () => {
+      // 200ms 미만이고 이동 거리가 짧으면 클릭으로 간주
       if (Date.now() - startTime < 200) {
         setSelectedPieceId(prev => prev === pieceId ? null : pieceId);
       }
@@ -66,7 +71,12 @@ const YutBoard = ({ pieces, teams, onMovePiece, currentTurn, logic, svgRef }: Yu
     const piece = pieces.find(p => p.id === drag.pieceId);
     const nearest = findNearestNode(drag.currentX, drag.currentY);
     
-    if (nearest) {
+    // 드래그 거리 계산
+    const startPos = dragStartRef.current;
+    const dist = startPos ? Math.sqrt(Math.pow(drag.currentX - startPos.x, 2) + Math.pow(drag.currentY - startPos.y, 2)) : 0;
+
+    // 5px 이상 움직였을 때만 드래그 이동으로 처리
+    if (dist > 5 && nearest) {
       if (piece?.nodeId === null && nearest.id === 'n0') {
         // 처음 출발하는 경우
         onMovePiece(drag.pieceId, null);
@@ -74,11 +84,12 @@ const YutBoard = ({ pieces, teams, onMovePiece, currentTurn, logic, svgRef }: Yu
         // 다른 노드로 이동했을 때만 이동 함수 호출
         onMovePiece(drag.pieceId, nearest.id);
       }
-      // 같은 위치면 이동 처리 하지 않음 (클릭으로 간주되거나 제자리 놓기)
-    } else {
-      // 대시보드로 복귀하거나 원래 위치 유지 (아무것도 하지 않음 -> 드래그 상태 해제 시 리렌더링으로 복구됨)
+      // 같은 위치면 이동 처리 하지 않음
     }
+    
+    // UI 상의 위치 복구 등은 리렌더링으로 처리됨
     setDrag(null);
+    dragStartRef.current = null;
   }, [drag, onMovePiece, pieces, setDrag]);
 
   const isStackRepresentative = (piece: Piece): boolean => {

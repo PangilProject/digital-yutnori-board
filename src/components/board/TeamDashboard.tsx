@@ -129,6 +129,7 @@ export const TeamDashboard = ({
                               onClick={(e) => {
                                 e.stopPropagation();
                                 onMoveOption?.(p.id, opt.steps);
+                                onSelectPiece?.(null); // Explicitly close popover
                               }}
                               className="w-7 h-7 lg:w-10 lg:h-10 rounded-full text-[10px] lg:text-sm font-black flex items-center justify-center text-white shadow-sm hover:scale-110 active:scale-90 transition-transform"
                               style={{ backgroundColor: opt.color }}
