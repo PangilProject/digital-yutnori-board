@@ -43,8 +43,9 @@ export const TeamDashboard = ({
   ];
 
   return (
+  return (
     <div 
-      className={`flex flex-col gap-3 p-4 rounded-xl border-2 transition-all duration-500 ${
+      className={`flex flex-col gap-2 p-3 rounded-xl border-2 transition-all duration-500 ${
         isCurrentTurn 
           ? 'bg-background shadow-xl scale-[1.02] z-10' 
           : 'bg-white/5 border-white/10'
@@ -57,16 +58,16 @@ export const TeamDashboard = ({
       {/* Header: Name and Status */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <div className="p-1.5 rounded-lg bg-muted/50 text-xl shadow-sm">
+          <div className="p-1.5 rounded-lg bg-muted/50 text-lg shadow-sm">
             {team.emoji}
           </div>
           <div>
-            <h3 className="font-black text-base tracking-tight leading-tight" style={{ color: isCurrentTurn ? team.color : 'white' }}>
+            <h3 className="font-black text-sm tracking-tight leading-tight" style={{ color: isCurrentTurn ? team.color : 'white' }}>
               {team.name}
             </h3>
             <div className="flex items-center gap-1.5 mt-0.5">
-              <CheckCircle2 size={12} className="text-green-600" />
-              <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">
+              <CheckCircle2 size={10} className="text-green-600" />
+              <span className="text-[9px] font-bold text-muted-foreground uppercase tracking-widest">
                 {finishedCount} / {totalCount} 골인
               </span>
             </div>
@@ -80,14 +81,14 @@ export const TeamDashboard = ({
       </div>
 
       {/* Piece Status Lists */}
-      <div className="grid grid-cols-2 gap-2 mt-1">
+      <div className="grid grid-cols-2 gap-2 mt-0.5">
         {/* Waiting Pieces (Not yet out) */}
-        <div className="bg-muted/20 p-2 rounded-lg border border-transparent hover:border-muted-foreground/10 transition-all">
-          <div className="flex items-center gap-1 mb-1.5">
-            <Home size={12} className="text-gray-400" />
+        <div className="bg-muted/20 p-1.5 rounded-lg border border-transparent hover:border-muted-foreground/10 transition-all">
+          <div className="flex items-center gap-1 mb-1">
+            <Home size={10} className="text-gray-400" />
             <span className="text-[9px] font-black text-gray-400 uppercase tracking-tighter">안 나온 말</span>
           </div>
-          <div className="flex flex-wrap gap-1.5 relative">
+          <div className="flex flex-wrap gap-1 relative">
             {waitingPieces.length > 0 ? (
               waitingPieces.map((p) => (
                 <div key={p.id} className="relative">
@@ -95,7 +96,7 @@ export const TeamDashboard = ({
                     onPointerDown={(e) => isCurrentTurn && onDragStart?.(p.id, e)}
                     onClick={() => isCurrentTurn && onSelectPiece?.(p.id)}
                     disabled={!isCurrentTurn}
-                    className={`w-7 h-7 rounded-full flex items-center justify-center text-sm shadow-sm border-2 transition-all ${
+                    className={`w-6 h-6 rounded-full flex items-center justify-center text-xs shadow-sm border-2 transition-all ${
                       selectedPieceId === p.id 
                       ? 'scale-110 border-primary shadow-md ring-2 ring-primary/20 ring-offset-1' 
                       : 'border-white/50 hover:scale-105 active:scale-95'
@@ -109,7 +110,7 @@ export const TeamDashboard = ({
                   {selectedPieceId === p.id && isCurrentTurn && (
                     <div className="absolute bottom-[calc(100%+8px)] left-1/2 -translate-x-1/2 z-[50] pointer-events-auto w-max">
                       <div className="animate-in fade-in zoom-in-95 duration-200 origin-bottom">
-                        <div className="bg-white p-1 rounded-xl shadow-2xl border-2 border-primary/20 flex gap-1 whitespace-nowrap min-w-[180px] justify-center backdrop-blur-md bg-white/95">
+                        <div className="bg-white p-1 rounded-xl shadow-2xl border-2 border-primary/20 flex gap-1 whitespace-nowrap min-w-[150px] justify-center backdrop-blur-md bg-white/95">
                           {moveOptions.map((opt) => (
                             <button
                               key={opt.label}
@@ -117,7 +118,7 @@ export const TeamDashboard = ({
                                 e.stopPropagation();
                                 onMoveOption?.(p.id, opt.steps);
                               }}
-                              className="w-7 h-7 rounded-full text-[10px] font-black flex items-center justify-center text-white shadow-sm hover:scale-110 active:scale-90 transition-transform"
+                              className="w-6 h-6 rounded-full text-[9px] font-black flex items-center justify-center text-white shadow-sm hover:scale-110 active:scale-90 transition-transform"
                               style={{ backgroundColor: opt.color }}
                             >
                               {opt.label}
@@ -132,37 +133,38 @@ export const TeamDashboard = ({
                 </div>
               ))
             ) : (
-              <span className="text-[9px] text-muted-foreground/50 font-medium tracking-tight">모든 말 출발</span>
+              <span className="text-[8px] text-muted-foreground/50 font-medium tracking-tight">모든 말 출발</span>
             )}
           </div>
         </div>
 
         {/* Active Pieces (Count Only) */}
-        <div className="bg-primary/5 p-2 rounded-lg border border-primary/5 hover:border-primary/10 transition-all flex flex-col items-center justify-center">
-          <div className="flex items-center gap-1 mb-1">
-            <PlayCircle size={12} className="text-primary" />
+        <div className="bg-primary/5 p-1.5 rounded-lg border border-primary/5 hover:border-primary/10 transition-all flex flex-col items-center justify-center">
+          <div className="flex items-center gap-1 mb-0.5">
+            <PlayCircle size={10} className="text-primary" />
             <span className="text-[9px] font-black text-primary uppercase tracking-tighter">말판 위</span>
           </div>
           <div className="flex items-baseline gap-1">
-            <span className="text-xl font-black text-primary leading-none">
+            <span className="text-lg font-black text-primary leading-none">
               {activePieces.length}
             </span>
-            <span className="text-[10px] font-bold text-primary/60">동</span>
+            <span className="text-[9px] font-bold text-primary/60">동</span>
           </div>
         </div>
       </div>
 
       {/* Action Button */}
-      {isCurrentTurn && onNextTurn && (
+      {isCurrentTurn && (
         <Button 
           onClick={onNextTurn} 
-          className="w-full font-black text-sm h-10 shadow-lg hover:shadow-xl transition-all active:scale-[0.98] rounded-lg flex items-center justify-center gap-1.5 mt-1"
+          disabled={!onNextTurn}
+          className="w-full font-black text-xs h-9 shadow-lg hover:shadow-xl transition-all active:scale-[0.98] rounded-lg flex items-center justify-center gap-1 mt-0.5"
           style={{ 
             backgroundColor: team.color, 
             boxShadow: `0 4px 15px ${team.color}30` 
           }}
         >
-          턴 넘기기 <ChevronRight size={18} />
+          턴 넘기기 <ChevronRight size={14} />
         </Button>
       )}
     </div>

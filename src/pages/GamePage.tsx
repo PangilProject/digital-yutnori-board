@@ -118,10 +118,10 @@ const GamePage = () => {
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-blue-900/20 via-slate-950/0 to-slate-950/40" />
       </div>
 
-      <div className="relative z-10 p-3 md:p-6 lg:p-10">
+      <div className="relative z-10 p-2 md:p-4 lg:p-6">
       
       {/* Header */}
-      <div className="max-w-[1600px] mx-auto flex flex-col md:flex-row items-center justify-between mb-6 px-2 gap-4 md:gap-0">
+      <div className="max-w-[1600px] mx-auto flex flex-col md:flex-row items-center justify-between mb-4 md:mb-6 px-2 gap-4 md:gap-0">
           <div className="flex items-center gap-3">
             <span className="text-3xl filter drop-shadow-md hidden md:block">🎲</span>
             <h1 className="text-xl md:text-2xl font-black tracking-tight text-white/90 drop-shadow-sm whitespace-nowrap">
@@ -175,11 +175,11 @@ const GamePage = () => {
 
       <div className="max-w-[1700px] mx-auto">
         {/* Main Grid Layout: 2 Columns on PC/Tablet */}
-        <div className="grid grid-cols-1 lg:grid-cols-[1fr_380px] gap-8 items-start">
+        <div className="grid grid-cols-1 lg:grid-cols-[1fr_360px] xl:grid-cols-[1fr_380px] gap-6 lg:gap-8 items-start">
           
           {/* Main Area: Yut Board */}
-          <div className="relative flex-1 flex flex-col items-center order-1">
-            <div className="relative w-full max-w-[1000px] bg-white/5 p-4 md:p-8 rounded-[3rem] shadow-[0_0_50px_rgba(0,0,0,0.5)] border border-white/10 backdrop-blur-md">
+          <div className="relative flex-1 flex flex-col items-center order-1 w-full">
+            <div className="relative w-full max-w-[800px] lg:max-w-[1000px] bg-white/5 p-4 md:p-6 lg:p-8 rounded-[2.5rem] md:rounded-[3rem] shadow-[0_0_50px_rgba(0,0,0,0.5)] border border-white/10 backdrop-blur-md">
               <YutBoard
                 pieces={gameState.pieces}
                 teams={gameState.teams}
@@ -212,8 +212,8 @@ const GamePage = () => {
           </div>
 
           {/* Sidebar Area: All Team Dashboards */}
-          <div className="flex flex-col gap-5 order-2">
-            <div className="mb-2 px-2">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:flex lg:flex-col gap-3 md:gap-4 order-2 w-full">
+            <div className="mb-0 px-2 lg:mb-2 md:col-span-2 lg:col-span-1">
               <h2 className="text-sm font-black text-gray-400 uppercase tracking-widest flex items-center gap-2">
                 <div className="w-2 h-2 rounded-full bg-blue-500 animate-pulse shadow-[0_0_10px_#3b82f6]" />
                 Team Status
