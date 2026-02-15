@@ -6,12 +6,13 @@ interface CaptureNarratorProps {
   capturedTeam: string;
   count: number;
   id: string;
+  className?: string; // 스타일 오버라이드 지원
 }
 
 /**
  * 상대방의 말을 잡았을 때 화면 중앙에 강렬한 임팩트를 주는 애니메이션 오버레이입니다.
  */
-const CaptureNarrator: React.FC<CaptureNarratorProps> = ({ capturingTeam, capturedTeam, count, id }) => {
+const CaptureNarrator: React.FC<CaptureNarratorProps> = ({ capturingTeam, capturedTeam, count, id, className }) => {
   const [visible, setVisible] = useState(false);
 
   useEffect(() => {
@@ -25,7 +26,10 @@ const CaptureNarrator: React.FC<CaptureNarratorProps> = ({ capturingTeam, captur
   if (!visible) return null;
 
   return (
-    <div className="fixed inset-0 z-[200] flex items-center justify-center pointer-events-none overflow-hidden">
+    <div className={cn(
+      "fixed inset-0 z-[200] flex items-center justify-center pointer-events-none overflow-hidden",
+      className
+    )}>
       {/* 배경 섬광 효과 */}
       <div className="absolute inset-0 bg-white/10 backdrop-blur-[2px] animate-in fade-in duration-300" />
       

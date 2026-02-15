@@ -1,15 +1,17 @@
 import React, { useEffect, useState } from 'react';
+import { cn } from '@/lib/utils';
 
 interface GoalNarratorProps {
   teamName: string;
   count: number;
   id: string;
+  className?: string;
 }
 
 /**
  * 말이 골인(Finish)했을 때 화면 중앙에 화사한 축하 효과를 주는 애니메이션 오버레이입니다.
  */
-const GoalNarrator: React.FC<GoalNarratorProps> = ({ teamName, count, id }) => {
+const GoalNarrator: React.FC<GoalNarratorProps> = ({ teamName, count, id, className }) => {
   const [visible, setVisible] = useState(false);
 
   useEffect(() => {
@@ -23,7 +25,10 @@ const GoalNarrator: React.FC<GoalNarratorProps> = ({ teamName, count, id }) => {
   if (!visible) return null;
 
   return (
-    <div className="fixed inset-0 z-[200] flex items-center justify-center pointer-events-none overflow-hidden">
+    <div className={cn(
+      "fixed inset-0 z-[200] flex items-center justify-center pointer-events-none overflow-hidden",
+      className
+    )}>
       {/* 화사한 배경 발광 효과 (Gold/Yellow) */}
       <div className="absolute inset-0 bg-amber-400/5 backdrop-blur-[1px] animate-in fade-in duration-500" />
       
