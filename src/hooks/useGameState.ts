@@ -1,6 +1,7 @@
 import { useState, useCallback, useEffect } from 'react';
 import { GameState, Piece, TeamConfig, TeamId, TeamStats } from '@/types/game';
 import { getNodeById } from '@/data/boardNodes';
+import { toast } from '@/hooks/use-toast';
 
 const STORAGE_KEY = 'yutnori-game-state';
 
@@ -162,6 +163,12 @@ export function useGameState() {
               const capturedTeam = getTeam(capturedTeamId, prev);
               const count = opponentPieces.filter(p => p.team === capturedTeamId).length;
               logs.push(`💥 ${team?.name}이(가) ${capturedTeam?.name}의 말 ${count}개를 잡았습니다!`);
+              
+              toast({
+                title: "💥 말 포획 성공!",
+                description: `${team?.name} 팀이 ${capturedTeam?.name} 팀의 말 ${count}개를 잡았습니다!`,
+                duration: 3000,
+              });
             });
             updatedPieces = updatedPieces.map(p =>
               opponentPieces.some(cp => cp.id === p.id) ? { ...p, nodeId: null } : p
