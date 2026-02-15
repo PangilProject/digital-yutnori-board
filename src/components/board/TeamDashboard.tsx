@@ -47,10 +47,10 @@ export const TeamDashboard = ({
       className={`flex flex-col gap-3 p-4 rounded-xl border-2 transition-all duration-500 ${
         isCurrentTurn 
           ? 'bg-background shadow-xl scale-[1.02] z-10' 
-          : 'bg-muted/30 opacity-80 border-transparent'
+          : 'bg-white/5 border-white/10'
       }`}
       style={{ 
-        borderColor: isCurrentTurn ? team.color : `${team.color}10`,
+        borderColor: isCurrentTurn ? team.color : 'rgba(255,255,255,0.1)',
         boxShadow: isCurrentTurn ? `0 10px 30px ${team.color}20` : 'none'
       }}
     >
@@ -61,7 +61,7 @@ export const TeamDashboard = ({
             {team.emoji}
           </div>
           <div>
-            <h3 className="font-black text-base tracking-tight leading-tight" style={{ color: team.color }}>
+            <h3 className="font-black text-base tracking-tight leading-tight" style={{ color: isCurrentTurn ? team.color : 'white' }}>
               {team.name}
             </h3>
             <div className="flex items-center gap-1.5 mt-0.5">
@@ -84,8 +84,8 @@ export const TeamDashboard = ({
         {/* Waiting Pieces (Not yet out) */}
         <div className="bg-muted/20 p-2 rounded-lg border border-transparent hover:border-muted-foreground/10 transition-all">
           <div className="flex items-center gap-1 mb-1.5">
-            <Home size={12} className="text-muted-foreground" />
-            <span className="text-[9px] font-black text-muted-foreground uppercase tracking-tighter">안 나온 말</span>
+            <Home size={12} className="text-gray-400" />
+            <span className="text-[9px] font-black text-gray-400 uppercase tracking-tighter">안 나온 말</span>
           </div>
           <div className="flex flex-wrap gap-1.5 relative">
             {waitingPieces.length > 0 ? (
@@ -107,8 +107,8 @@ export const TeamDashboard = ({
 
                   {/* Dashboard Tulip Menu (MoveMenu) */}
                   {selectedPieceId === p.id && isCurrentTurn && (
-                    <div className="absolute bottom-[calc(100%+8px)] left-1/2 -translate-x-1/2 z-[50] pointer-events-auto">
-                      <div className="animate-in fade-in zoom-in slide-in-from-bottom-2 duration-200">
+                    <div className="absolute bottom-[calc(100%+8px)] left-1/2 -translate-x-1/2 z-[50] pointer-events-auto w-max">
+                      <div className="animate-in fade-in zoom-in-95 duration-200 origin-bottom">
                         <div className="bg-white p-1 rounded-xl shadow-2xl border-2 border-primary/20 flex gap-1 whitespace-nowrap min-w-[180px] justify-center backdrop-blur-md bg-white/95">
                           {moveOptions.map((opt) => (
                             <button

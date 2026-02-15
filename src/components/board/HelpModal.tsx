@@ -14,7 +14,7 @@ export const HelpModal = () => {
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <Button variant="outline" size="icon" className="rounded-full w-10 h-10 shadow-md">
+        <Button variant="ghost" size="icon" className="rounded-full w-10 h-10 shadow-md bg-white/10 hover:bg-white/20 text-white border border-white/10 backdrop-blur-sm">
           <HelpCircle className="h-5 w-5" />
         </Button>
       </DialogTrigger>
