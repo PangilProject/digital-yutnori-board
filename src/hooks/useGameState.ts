@@ -271,19 +271,29 @@ export function useGameState() {
     trackEvent({ category: 'Game', action: 'game_reset' });
   }, []);
 
-  const setFirstTurn = useCallback((teamId: TeamId) => {
+  const setTeamOrder = useCallback((orderedTeamIds: TeamId[]) => {
     setGameState(prev => {
       if (!prev) return null;
-      const team = prev.teams.find(t => t.id === teamId);
+      
+      // 입력된 ID 순서대로 팀 배열 재정렬
+      const orderedTeams = orderedTeamIds
+        .map(id => prev.teams.find(t => t.id === id))
+        .filter((t): t is TeamConfig => !!t);
+
+      if (orderedTeams.length !== prev.teams.length) return prev;
+
+      const firstTeam = orderedTeams[0];
+      
       return {
         ...prev,
-        currentTurn: teamId,
+        teams: orderedTeams, // 팀 순서 변경
+        currentTurn: firstTeam.id,
         status: 'playing',
         startTime: Date.now(),
-        logs: [...prev.logs, `👉 ${team?.name} 팀이 먼저 시작합니다!`]
+        logs: [...prev.logs, `👉 게임 순서가 결정되었습니다: ${orderedTeams.map(t => t.name).join(' → ')}`]
       };
     });
   }, []);
 
-  return { gameState, setGameState, movePiece, nextTurn, resetGame, restartGame, setFirstTurn };
+  return { gameState, setGameState, movePiece, nextTurn, resetGame, restartGame, setTeamOrder };
 }

@@ -20,7 +20,7 @@ import { RefreshCcw } from 'lucide-react';
 
 const GamePage = () => {
   const navigate = useNavigate();
-  const { gameState, movePiece, nextTurn, resetGame, restartGame, setFirstTurn } = useGameState();
+  const { gameState, movePiece, nextTurn, resetGame, restartGame, setTeamOrder } = useGameState();
   const { currentStep, isVisible, completeStep, skipOnboarding } = useOnboarding();
   const svgRef = useRef<SVGSVGElement>(null);
 
@@ -261,7 +261,7 @@ const GamePage = () => {
       {gameState.status === 'first_turn' && (
         <FirstTurnSelection 
           teams={gameState.teams}
-          onSelect={setFirstTurn}
+          onOrderComplete={setTeamOrder} // Note: setFirstTurn is effectively setTeamOrder now, but I renamed it in the hook. I need to make sure I use the destuctured name correctly.
         />
       )}
 
