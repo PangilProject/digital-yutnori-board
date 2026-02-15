@@ -7,6 +7,7 @@ import GameplayPreview from '@/components/landing/GameplayPreview';
 import CaptureNarrator from '@/components/board/CaptureNarrator';
 import GoalNarrator from '@/components/board/GoalNarrator';
 import { MousePointer2, Zap, Layout, Trophy, Users, PlayCircle, Eye, MousePointerClick, Sparkles } from 'lucide-react';
+import { AnalyticsStats } from '@/components/AnalyticsStats';
 
 const LandingPage = () => {
   const navigate = useNavigate();
@@ -116,7 +117,11 @@ const LandingPage = () => {
                 <span className="animate-bounce mt-1">↓</span>
               </button>
             </div>
-          </div>
+            </div>
+            
+            {/* Live Analytics Stats */}
+            <AnalyticsStats />
+
         </main>
       </section>
 
