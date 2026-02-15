@@ -5,6 +5,7 @@ import YutBoard from '@/components/YutBoard';
 import GameResult from '@/components/board/GameResult';
 import { useGameState } from '@/hooks/useGameState';
 import { HelpModal } from '@/components/board/HelpModal';
+import { ConfirmModal } from "@/components/ui/ConfirmModal";
 import { TeamDashboard } from '@/components/board/TeamDashboard';
 import { useOnboarding } from '@/hooks/useOnboarding';
 import { OnboardingTooltip } from '@/components/board/OnboardingTooltip';
@@ -128,14 +129,23 @@ const GamePage = () => {
           
           <div className="flex items-center gap-2">
             <HelpModal />
-            <Button 
-              variant="ghost"
-              size="sm" 
-              onClick={handleReset}
-              className="gap-2 bg-white/5 text-gray-400 hover:text-white hover:bg-red-500/20 border border-white/5 transition-all text-xs h-10 px-4 rounded-full font-bold backdrop-blur-sm"
-            >
-              <RefreshCcw size={14} /> 게임 초기화
-            </Button>
+            <ConfirmModal
+              title="게임 초기화"
+              description="현재 진행 중인 게임 내용이 모두 사라집니다. 정말 초기화하시겠습니까?"
+              confirmText="초기화"
+              cancelText="취소"
+              onConfirm={handleReset}
+              variant="destructive"
+              trigger={
+                <Button 
+                  variant="ghost"
+                  size="sm" 
+                  className="gap-2 bg-white/5 text-gray-400 hover:text-white hover:bg-red-500/20 border border-white/5 transition-all text-xs h-10 px-4 rounded-full font-bold backdrop-blur-sm"
+                >
+                  <RefreshCcw size={14} /> 게임 초기화
+                </Button>
+              }
+            />
           </div>
       </div>
 
