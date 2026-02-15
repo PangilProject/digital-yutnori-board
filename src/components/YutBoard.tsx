@@ -70,13 +70,13 @@ const YutBoard = ({ pieces, teams, onMovePiece, currentTurn, logic, svgRef }: Yu
       if (piece?.nodeId === null && nearest.id === 'n0') {
         // 처음 출발하는 경우
         onMovePiece(drag.pieceId, null);
-      } else {
-        // 일반 이동
+      } else if (piece?.nodeId !== nearest.id) {
+        // 다른 노드로 이동했을 때만 이동 함수 호출
         onMovePiece(drag.pieceId, nearest.id);
       }
+      // 같은 위치면 이동 처리 하지 않음 (클릭으로 간주되거나 제자리 놓기)
     } else {
-      // 대시보드로 복귀하거나 원래 위치 유지
-      onMovePiece(drag.pieceId, piece?.nodeId || null);
+      // 대시보드로 복귀하거나 원래 위치 유지 (아무것도 하지 않음 -> 드래그 상태 해제 시 리렌더링으로 복구됨)
     }
     setDrag(null);
   }, [drag, onMovePiece, pieces, setDrag]);

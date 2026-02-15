@@ -124,6 +124,8 @@ export const TeamDashboard = ({
                           {moveOptions.map((opt) => (
                             <button
                               key={opt.label}
+                              onPointerDown={(e) => e.stopPropagation()}
+                              onMouseDown={(e) => e.stopPropagation()}
                               onClick={(e) => {
                                 e.stopPropagation();
                                 onMoveOption?.(p.id, opt.steps);
