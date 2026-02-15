@@ -84,7 +84,7 @@ const GamePage = () => {
 
   const handleReset = () => {
     resetGame();
-    navigate('/', { replace: true });
+    navigate('/setup', { replace: true });
   };
 
   const handleRestart = () => {
