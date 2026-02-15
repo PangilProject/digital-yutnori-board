@@ -1,6 +1,7 @@
 import { useState, useCallback, useEffect } from 'react';
 import { GameState, Piece, TeamConfig, TeamId, TeamStats } from '@/types/game';
 import { getNodeById } from '@/data/boardNodes';
+import { trackEvent } from '@/lib/analytics';
 
 const STORAGE_KEY = 'yutnori-game-state';
 
@@ -49,6 +50,14 @@ export function initializeGame(teams: TeamConfig[]): GameState {
     winnerId: null
   };
   saveState(state);
+  
+  trackEvent({
+    category: 'Game',
+    action: 'game_start',
+    value: teams.length,
+    team_names: teamNames
+  });
+
   return state;
 }
 
@@ -114,6 +123,16 @@ export function useGameState() {
       const logs = [...prev.logs];
       logs.push(`${team?.emoji || ''} ${team?.name || piece.team} ${pieceNum} → ${targetLabel}`);
 
+      trackEvent({
+        category: 'Game',
+        action: 'piece_move',
+        label: team?.name,
+        team_id: piece.team,
+        from_node: piece.nodeId || 'home',
+        to_node: isGoalMove ? 'goal' : (targetNodeId || 'home'),
+        is_goal: isGoalMove ? 1 : 0
+      });
+
       // 통계 업데이트를 위한 복사본
       const nextStats = { ...prev.stats };
       const teamStats = { ...nextStats[piece.team] };
@@ -134,6 +153,13 @@ export function useGameState() {
         );
         if (existingPieces.length > 0) {
           teamStats.stackCount += 1;
+          trackEvent({
+            category: 'Game',
+            action: 'piece_stack',
+            label: team?.name,
+            team_id: piece.team,
+            stack_count: stackCount + existingPieces.length
+          });
         }
       }
 
@@ -174,6 +200,14 @@ export function useGameState() {
               const count = opponentPieces.filter(p => p.team === capturedTeamId).length;
               logs.push(`💥 ${team?.name}이(가) ${capturedTeam?.name}의 말 ${count}개를 잡았습니다!`);
               
+              trackEvent({
+                category: 'Game',
+                action: 'piece_capture',
+                capturing_team: team?.name,
+                captured_team: capturedTeam?.name,
+                capture_count: count
+              });
+              
               // 대형 포획 내레이터 트리거
               const capturingTeamName = team?.name || piece.team;
               const capturedTeamName = capturedTeam?.name || capturedTeamId;
@@ -203,6 +237,13 @@ export function useGameState() {
 
       if (winnerId) {
         logs.push(`🏆 축하합니다! ${team?.name}이(가) 최종 승리하였습니다!`);
+        trackEvent({
+          category: 'Game',
+          action: 'game_complete',
+          label: team?.name,
+          winner_team: team?.name,
+          total_turns: prev.logs.length // Approximate turn count from logs
+        });
       }
 
       return { 
@@ -225,6 +266,7 @@ export function useGameState() {
   const resetGame = useCallback(() => {
     clearGameState();
     setGameState(null);
+    trackEvent({ category: 'Game', action: 'game_reset' });
   }, []);
 
   return { gameState, setGameState, movePiece, nextTurn, resetGame, restartGame };

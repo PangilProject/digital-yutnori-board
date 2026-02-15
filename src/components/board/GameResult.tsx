@@ -10,6 +10,8 @@ interface GameResultProps {
   onHome: () => void;
 }
 
+import { trackEvent } from '@/lib/analytics';
+
 const GameResult: React.FC<GameResultProps> = ({ gameState, onRestart, onHome }) => {
   const winner = gameState.teams.find(t => t.id === gameState.winnerId);
   const [show, setShow] = useState(false);
@@ -39,6 +41,24 @@ const GameResult: React.FC<GameResultProps> = ({ gameState, onRestart, onHome })
       return () => clearInterval(interval);
     }
   }, [gameState.winnerId]);
+
+  const handleRestart = () => {
+    trackEvent({
+      category: 'Button',
+      action: 'click',
+      label: 'game_result_restart'
+    });
+    onRestart();
+  };
+
+  const handleHome = () => {
+    trackEvent({
+      category: 'Button',
+      action: 'click',
+      label: 'game_result_home'
+    });
+    onHome();
+  };
 
   if (!winner) return null;
 
@@ -118,7 +138,7 @@ const GameResult: React.FC<GameResultProps> = ({ gameState, onRestart, onHome })
         <div className="p-8 md:px-10 md:py-8 bg-white">
           <div className="flex flex-col sm:flex-row gap-4">
             <Button 
-              onClick={onRestart}
+              onClick={handleRestart}
               className="flex-[2] h-16 text-xl font-black gap-3 rounded-2xl shadow-xl transition-all duration-300 transform hover:scale-[1.02] active:scale-[0.98] text-white"
               style={{ 
                 background: winner.color,
@@ -130,7 +150,7 @@ const GameResult: React.FC<GameResultProps> = ({ gameState, onRestart, onHome })
             </Button>
             <Button 
               variant="outline" 
-              onClick={onHome}
+              onClick={handleHome}
               className="flex-1 h-16 text-lg font-bold gap-2 rounded-2xl border-2 border-slate-200 hover:bg-slate-50 transition-all text-slate-600"
             >
               <Home size={20} />
