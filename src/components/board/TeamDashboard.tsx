@@ -12,6 +12,7 @@ interface TeamDashboardProps {
   onSelectPiece?: (pieceId: string) => void;
   selectedPieceId?: string | null;
   onMoveOption?: (pieceId: string, steps: number) => void;
+  onDragStart?: (pieceId: string, event: React.PointerEvent) => void;
 }
 
 export const TeamDashboard = ({ 
@@ -21,7 +22,8 @@ export const TeamDashboard = ({
   onNextTurn,
   onSelectPiece,
   selectedPieceId,
-  onMoveOption
+  onMoveOption,
+  onDragStart
 }: TeamDashboardProps) => {
   const teamPieces = pieces.filter(p => p.team === team.id);
   const finishedPieces = teamPieces.filter(p => p.isFinished);
@@ -90,6 +92,7 @@ export const TeamDashboard = ({
               waitingPieces.map((p) => (
                 <div key={p.id} className="relative">
                   <button 
+                    onPointerDown={(e) => isCurrentTurn && onDragStart?.(p.id, e)}
                     onClick={() => isCurrentTurn && onSelectPiece?.(p.id)}
                     disabled={!isCurrentTurn}
                     className={`w-7 h-7 rounded-full flex items-center justify-center text-sm shadow-sm border-2 transition-all ${

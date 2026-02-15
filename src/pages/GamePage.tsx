@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useRef, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import YutBoard from '@/components/YutBoard';
@@ -14,6 +14,7 @@ const GamePage = () => {
   const navigate = useNavigate();
   const { gameState, movePiece, nextTurn, resetGame, restartGame } = useGameState();
   const { currentStep, isVisible, completeStep, skipOnboarding } = useOnboarding();
+  const svgRef = useRef<SVGSVGElement>(null);
 
   // 보드 로직을 페이지 레벨로 끌어올려 대시보드와 공유
   const boardLogic = useYutBoardLogic(
@@ -26,6 +27,50 @@ const GamePage = () => {
     },
     gameState?.currentTurn
   );
+
+  const { setters, helpers } = boardLogic;
+
+  // 대시보드에서 보드판으로 직접 드래그하는 로직
+  const handleDashboardDragStart = useCallback((pieceId: string, e: React.PointerEvent) => {
+    if (!svgRef.current) return;
+    
+    // 1. 초기 SVG 좌표 계산 및 드래그 상태 시작
+    const pos = helpers.clientToSVG(e.clientX, e.clientY, svgRef.current);
+    setters.setDrag({ pieceId, currentX: pos.x, currentY: pos.y });
+    setters.setSelectedPieceId(null);
+
+    // 2. 글로벌 마우스 이동 핸들러
+    const handleGlobalMove = (moveEvent: PointerEvent) => {
+      if (!svgRef.current) return;
+      const movePos = helpers.clientToSVG(moveEvent.clientX, moveEvent.clientY, svgRef.current);
+      setters.setDrag(prev => prev ? { ...prev, currentX: movePos.x, currentY: movePos.y } : null);
+    };
+
+    // 3. 글로벌 마우스 업 핸들러 (이동 완료)
+    const handleGlobalUp = (upEvent: PointerEvent) => {
+      if (!svgRef.current) return;
+      const upPos = helpers.clientToSVG(upEvent.clientX, upEvent.clientY, svgRef.current);
+      const piece = gameState?.pieces.find(p => p.id === pieceId);
+      const nearest = helpers.findNearestNode(upPos.x, upPos.y);
+
+      if (nearest) {
+        if (piece?.nodeId === null && nearest.id === 'n0') {
+          // 대기실에서 출발 지점으로 바로 놓았을 때
+          movePiece(pieceId, null);
+        } else {
+          // 일반 노드 위치에 놓았을 때
+          movePiece(pieceId, nearest.id);
+        }
+      }
+      
+      setters.setDrag(null);
+      window.removeEventListener('pointermove', handleGlobalMove);
+      window.removeEventListener('pointerup', handleGlobalUp);
+    };
+
+    window.addEventListener('pointermove', handleGlobalMove);
+    window.addEventListener('pointerup', handleGlobalUp);
+  }, [helpers, setters, gameState?.pieces, movePiece]);
 
   useEffect(() => {
     if (!gameState) navigate('/', { replace: true });
@@ -88,6 +133,7 @@ const GamePage = () => {
                 }}
                 currentTurn={gameState.currentTurn}
                 logic={boardLogic}
+                svgRef={svgRef}
               />
               
               {/* Board Overlays / Tooltips */}
@@ -141,6 +187,7 @@ const GamePage = () => {
                     }
                     boardLogic.setters.setSelectedPieceId(null);
                   }}
+                  onDragStart={handleDashboardDragStart}
                 />
                 
                 {/* Move Piece Tooltip - Points to the Dashboard */}

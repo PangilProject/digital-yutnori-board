@@ -218,6 +218,6 @@ export function useYutBoardLogic(
     states: { drag, captureEffect, isShaking, selectedPieceId, animatingPiece },
     setters: { setDrag, setCaptureEffect, setIsShaking, setSelectedPieceId, setAnimatingPiece },
     memos: { pieceGroups, nodeMap, teamMap },
-    helpers: { clientToSVG, getPiecePosition, getMovementPath },
+    helpers: { clientToSVG, getPiecePosition, getMovementPath, findNearestNode },
   };
 }

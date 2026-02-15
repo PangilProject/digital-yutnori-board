@@ -15,12 +15,12 @@ interface YutBoardProps {
   onMovePiece: (pieceId: string, targetNodeId: string | null, isGoalMove?: boolean) => void;
   currentTurn?: string;
   logic: any; // 전달받은 보드 로직 상태 및 헬퍼
+  svgRef: React.RefObject<SVGSVGElement>;
 }
 
 const PIECE_RADIUS = 13;
 
-const YutBoard = ({ pieces, teams, onMovePiece, currentTurn, logic }: YutBoardProps) => {
-  const svgRef = useRef<SVGSVGElement>(null);
+const YutBoard = ({ pieces, teams, onMovePiece, currentTurn, logic, svgRef }: YutBoardProps) => {
   const { states, setters, memos, helpers } = logic;
   const { drag, captureEffect, isShaking, selectedPieceId, animatingPiece } = states;
   const { setDrag, setSelectedPieceId } = setters;
