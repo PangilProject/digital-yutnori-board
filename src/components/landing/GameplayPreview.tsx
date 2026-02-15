@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
@@ -82,6 +82,21 @@ export const GameplayPreview = () => {
 
   const logic = useYutBoardLogic(pieces, PREVIEW_TEAMS, handleMovePiece, currentTurn);
 
+  /* 승리 조건 감지: 파란팀(team0)의 모든 말이 골인하면 데모 종료 */
+  useEffect(() => {
+    // team0의 말들이 보드판 등에서 모두 isFinished 상태인지 확인
+    // INITIAL_PIECES 등 실제 pieces 상태 기반
+    const team0Pieces = pieces.filter(p => p.team === 'team0');
+    // 말 개수가 0보다 크고, 모두 isFinished여야 함
+    const allFinished = team0Pieces.length > 0 && team0Pieces.every(p => p.isFinished);
+    
+    if (allFinished && !isDemoEnded) {
+      // 마지막 골인 애니메이션 등을 감안하여 약간의 딜레이
+      const timer = setTimeout(() => setIsDemoEnded(true), 1200);
+      return () => clearTimeout(timer);
+    }
+  }, [pieces, isDemoEnded]);
+
   return (
     <div className="flex flex-col lg:flex-row items-center gap-8 w-full relative">
       {/* Dashboard Area */}
@@ -145,11 +160,19 @@ export const GameplayPreview = () => {
         ) : (
           <div className="absolute inset-0 z-50 flex flex-col items-center justify-center animate-in fade-in zoom-in duration-500 bg-slate-950/20 backdrop-blur-[2px]">
             <div className="p-8 rounded-[2.5rem] bg-white text-slate-900 shadow-2xl flex flex-col items-center text-center gap-4 border-4 border-blue-500/20">
-              <span className="text-4xl text-blue-500">🎮</span>
+              <span className="text-4xl text-blue-500">
+                {pieces.filter(p => p.team === 'team0').every(p => p.isFinished) ? '🎉' : '🎮'}
+              </span>
               <div>
-                <h3 className="text-2xl font-black tracking-tighter mb-1">체험판 종료</h3>
+                <h3 className="text-2xl font-black tracking-tighter mb-1">
+                  {pieces.filter(p => p.team === 'team0').every(p => p.isFinished) ? '축하합니다!' : '체험판 종료'}
+                </h3>
                 <p className="text-sm font-medium text-slate-500 leading-tight">
-                  이제 실제 게임에서 <br />모든 기능을 경험해보세요!
+                  {pieces.filter(p => p.team === 'team0').every(p => p.isFinished) ? (
+                    '모든 말을 골인시켰습니다! 🏆'
+                  ) : (
+                    <>이제 실제 게임에서 <br />모든 기능을 경험해보세요!</>
+                  )}
                 </p>
               </div>
               <Button 
