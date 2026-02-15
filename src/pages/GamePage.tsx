@@ -121,22 +121,40 @@ const GamePage = () => {
       <div className="relative z-10 p-3 md:p-6 lg:p-10">
       
       {/* Header */}
-      <div className="max-w-[1600px] mx-auto flex items-center justify-between mb-6 px-2">
+      <div className="max-w-[1600px] mx-auto flex flex-col md:flex-row items-center justify-between mb-6 px-2 gap-4 md:gap-0">
           <div className="flex items-center gap-3">
-            <span className="text-3xl filter drop-shadow-md">🎲</span>
-            <h1 className="text-2xl font-black tracking-tight text-white/90 drop-shadow-sm">
+            <span className="text-3xl filter drop-shadow-md hidden md:block">🎲</span>
+            <h1 className="text-xl md:text-2xl font-black tracking-tight text-white/90 drop-shadow-sm whitespace-nowrap">
               윷놀이 디지털 말판
             </h1>
           </div>
           
-          
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 flex-wrap justify-center">
             <GameTimer startTime={gameState.startTime} />
             <HelpModal />
             <ConfirmModal
-              title="게임 초기화"
-              description="현재 진행 중인 게임 내용이 모두 사라집니다. 정말 초기화하시겠습니까?"
-              confirmText="초기화"
+              title="게임 재시작"
+              description="현재 설정 그대로 게임을 처음부터 다시 시작합니다. 진행 상황이 초기화됩니다. 계속하시겠습니까?"
+              confirmText="재시작"
+              cancelText="취소"
+              onConfirm={handleRestart}
+              variant="default" // 파괴적이지 않으므로 기본 스타일 사용
+              trigger={
+                <Button 
+                  variant="ghost"
+                  size="sm" 
+                  className="gap-2 bg-white/5 text-gray-400 hover:text-white hover:bg-white/10 border border-white/5 transition-all text-xs h-10 px-3 md:px-4 rounded-full font-bold backdrop-blur-sm"
+                >
+                  <RefreshCcw size={14} className="rotate-180" /> 
+                  <span className="hidden sm:inline">게임 재시작</span>
+                  <span className="sm:hidden">재시작</span>
+                </Button>
+              }
+            />
+            <ConfirmModal
+              title="게임 종료"
+              description="현재 진행 중인 게임 내용이 모두 사라집니다. 정말 종료하시겠습니까?"
+              confirmText="종료"
               cancelText="취소"
               onConfirm={handleReset}
               variant="destructive"
@@ -144,9 +162,11 @@ const GamePage = () => {
                 <Button 
                   variant="ghost"
                   size="sm" 
-                  className="gap-2 bg-white/5 text-gray-400 hover:text-white hover:bg-red-500/20 border border-white/5 transition-all text-xs h-10 px-4 rounded-full font-bold backdrop-blur-sm"
+                  className="gap-2 bg-white/5 text-gray-400 hover:text-white hover:bg-red-500/20 border border-white/5 transition-all text-xs h-10 px-3 md:px-4 rounded-full font-bold backdrop-blur-sm"
                 >
-                  <RefreshCcw size={14} /> 게임 초기화
+                  <RefreshCcw size={14} /> 
+                  <span className="hidden sm:inline">게임 종료</span>
+                  <span className="sm:hidden">종료</span>
                 </Button>
               }
             />
