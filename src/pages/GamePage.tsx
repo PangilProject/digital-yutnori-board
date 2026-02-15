@@ -175,7 +175,7 @@ const GamePage = () => {
 
       <div className="max-w-[1600px] mx-auto">
         {/* Main Grid Layout: 2 Columns on PC/Tablet. Adjusted sidebar width for multi-column dashboards */}
-        <div className="grid grid-cols-1 lg:grid-cols-[1fr_520px] xl:grid-cols-[1fr_560px] gap-4 lg:gap-8 items-center h-full">
+        <div className="grid grid-cols-1 lg:grid-cols-[1fr_520px] xl:grid-cols-[1fr_560px] 2xl:grid-cols-[1fr_760px] gap-4 lg:gap-8 items-center h-full">
           
           {/* Main Area: Yut Board */}
           <div className="relative flex-1 flex flex-col items-center justify-center order-1 w-full h-full overflow-hidden">
