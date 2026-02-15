@@ -9,6 +9,7 @@ import { TeamDashboard } from '@/components/board/TeamDashboard';
 import { useOnboarding } from '@/hooks/useOnboarding';
 import { OnboardingTooltip } from '@/components/board/OnboardingTooltip';
 import { useYutBoardLogic } from '@/hooks/useYutBoardLogic';
+import CaptureNarrator from '@/components/board/CaptureNarrator';
 
 const GamePage = () => {
   const navigate = useNavigate();
@@ -220,6 +221,13 @@ const GamePage = () => {
 
         </div>
       </div>
+
+      {/* Capture Overlay */}
+      {gameState.lastCapture && (
+        <CaptureNarrator 
+          {...gameState.lastCapture}
+        />
+      )}
 
       {/* Result Overlay */}
       {gameState.winnerId && (

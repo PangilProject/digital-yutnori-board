@@ -50,6 +50,13 @@ export interface GameState {
   winnerId?: TeamId | null;
   /** 팀별 게임 통계 데이터 */
   stats?: Record<TeamId, TeamStats>;
+  /** 최근 발생한 포획 이벤트 정보 */
+  lastCapture?: {
+    capturingTeam: string;
+    capturedTeam: string;
+    count: number;
+    id: string; // 애니메이션 트리거를 위한 고유 ID
+  } | null;
 }
 
 export const TEAM_PRESETS: { color: string; colorLight: string; emoji: string; defaultName: string }[] = [
