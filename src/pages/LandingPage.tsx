@@ -3,7 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import heroBg from '@/assets/hero-bg.png';
-import { MousePointer2, Zap, Layout, Trophy, Users, PlayCircle } from 'lucide-react';
+import GameplayPreview from '@/components/landing/GameplayPreview';
+import { MousePointer2, Zap, Layout, Trophy, Users, PlayCircle, Eye, MousePointerClick } from 'lucide-react';
 
 const LandingPage = () => {
   const navigate = useNavigate();
@@ -113,6 +114,25 @@ const LandingPage = () => {
             </div>
           </div>
         </main>
+      </section>
+
+      {/* Gameplay Showcase Section (Live Preview) */}
+      <section className="relative z-10 w-full max-w-7xl px-6 py-20 overflow-visible">
+        <div className="text-center mb-16">
+          <div className="flex items-center justify-center gap-2 text-blue-400 mb-4">
+            <MousePointerClick className="w-5 h-5" />
+            <span className="text-sm font-bold tracking-widest uppercase">Live Experience</span>
+          </div>
+          <h2 className="text-4xl md:text-6xl font-black tracking-tighter mb-6">지금 <span className="text-blue-400">직접 체험</span>해보세요</h2>
+          <p className="text-gray-400 max-w-2xl mx-auto leading-relaxed">
+            별도의 설정 없이도 아래 보드판에서 우리 서비스만의 부드러운 조작감을 미리 확인하실 수 있습니다. 
+            전통의 규칙과 디지털의 편리함을 결합한 혁신적인 경험을 느껴보세요.
+          </p>
+        </div>
+
+        <div className="relative">
+          <GameplayPreview />
+        </div>
       </section>
 
       {/* Features Section */}
