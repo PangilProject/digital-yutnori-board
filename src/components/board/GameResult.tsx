@@ -106,14 +106,20 @@ const GameResult: React.FC<GameResultProps> = ({ gameState, onRestart, onHome })
               return (
                 <div 
                   key={team.id}
-                  className={`relative p-6 rounded-[1.5rem] transition-all duration-500 bg-white border-2 ${isWinner ? 'border-slate-900/5 shadow-[0_12px_24px_-8px_rgba(0,0,0,0.08)] scale-[1.02]' : 'border-transparent shadow-sm grayscale-[0.3] opacity-90'}`}
+                  className={`relative p-6 rounded-[1.5rem] transition-all duration-500 border-2 ${
+                    isWinner 
+                      ? 'bg-white border-slate-900/5 shadow-[0_12px_24px_-8px_rgba(0,0,0,0.08)] scale-[1.02] z-10' 
+                      : 'bg-slate-50/50 border-transparent hover:bg-white hover:border-slate-100/50 hover:shadow-lg hover:-translate-y-1'
+                  }`}
                 >
                   <div className="flex items-center justify-between mb-5">
                     <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-xl flex items-center justify-center text-xl bg-slate-50/50 border border-slate-100">
+                      <div className={`w-10 h-10 rounded-xl flex items-center justify-center text-xl border ${isWinner ? 'bg-slate-50/50 border-slate-100' : 'bg-white border-slate-100'}`}>
                         {team.emoji}
                       </div>
-                      <span className="font-black text-lg tracking-tight text-slate-800">{team.name}</span>
+                      <span className={`font-black text-lg tracking-tight ${isWinner ? 'text-slate-800' : 'text-slate-600'}`}>
+                        {team.name}
+                      </span>
                     </div>
                     {isWinner && (
                       <div className="px-2.5 py-1 bg-slate-900 text-white text-[10px] font-black rounded-lg uppercase tracking-widest">
@@ -170,7 +176,7 @@ const StatItem = ({ icon, label, value, color, active }: { icon: React.ReactNode
     </div>
     <div>
       <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wide leading-tight">{label}</p>
-      <p className="text-sm font-black leading-tight" style={{ color: active ? color : undefined }}>{value}</p>
+      <p className={`text-sm font-black leading-tight ${!active && 'text-slate-600'}`} style={{ color: active ? color : undefined }}>{value}</p>
     </div>
   </div>
 );
