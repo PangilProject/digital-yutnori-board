@@ -121,10 +121,10 @@ const GamePage = () => {
       <div className="relative z-10 p-2 md:p-4 lg:p-6">
       
       {/* Header */}
-      <div className="max-w-[1600px] mx-auto flex flex-col md:flex-row items-center justify-between mb-4 md:mb-6 px-2 gap-4 md:gap-0">
+      <div className="max-w-[1600px] w-full mx-auto flex flex-col md:flex-row items-center justify-between mb-2 md:mb-4 px-2 gap-2 md:gap-0 shrink-0">
           <div className="flex items-center gap-3">
-            <span className="text-3xl filter drop-shadow-md hidden md:block">🎲</span>
-            <h1 className="text-xl md:text-2xl font-black tracking-tight text-white/90 drop-shadow-sm whitespace-nowrap">
+            <span className="text-4xl md:text-5xl filter drop-shadow-md hidden md:block">🎲</span>
+            <h1 className="text-2xl md:text-3xl font-black tracking-tight text-white/90 drop-shadow-sm whitespace-nowrap">
               윷놀이 디지털 말판
             </h1>
           </div>
@@ -143,9 +143,9 @@ const GamePage = () => {
                 <Button 
                   variant="ghost"
                   size="sm" 
-                  className="gap-2 bg-white/5 text-gray-400 hover:text-white hover:bg-white/10 border border-white/5 transition-all text-xs h-10 px-3 md:px-4 rounded-full font-bold backdrop-blur-sm"
+                  className="gap-2 bg-white/5 text-gray-400 hover:text-white hover:bg-white/10 border border-white/5 transition-all text-sm h-10 px-4 md:px-5 rounded-full font-bold backdrop-blur-sm"
                 >
-                  <RefreshCcw size={14} className="rotate-180" /> 
+                  <RefreshCcw size={16} className="rotate-180" /> 
                   <span className="hidden sm:inline">게임 재시작</span>
                   <span className="sm:hidden">재시작</span>
                 </Button>
@@ -162,9 +162,9 @@ const GamePage = () => {
                 <Button 
                   variant="ghost"
                   size="sm" 
-                  className="gap-2 bg-white/5 text-gray-400 hover:text-white hover:bg-red-500/20 border border-white/5 transition-all text-xs h-10 px-3 md:px-4 rounded-full font-bold backdrop-blur-sm"
+                  className="gap-2 bg-white/5 text-gray-400 hover:text-white hover:bg-red-500/20 border border-white/5 transition-all text-sm h-10 px-4 md:px-5 rounded-full font-bold backdrop-blur-sm"
                 >
-                  <RefreshCcw size={14} /> 
+                  <RefreshCcw size={16} /> 
                   <span className="hidden sm:inline">게임 종료</span>
                   <span className="sm:hidden">종료</span>
                 </Button>

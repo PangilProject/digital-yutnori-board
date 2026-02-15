@@ -45,7 +45,7 @@ export const TeamDashboard = ({
 
   return (
     <div 
-      className={`flex flex-col gap-2 lg:gap-3 p-3 lg:p-4 rounded-xl border-2 transition-all duration-500 ${
+      className={`flex flex-col gap-2 lg:gap-4 p-3 lg:p-5 rounded-xl border-2 transition-all duration-500 ${
         isCurrentTurn 
           ? 'bg-background shadow-xl scale-[1.02] z-10' 
           : 'bg-white/5 border-white/10'
@@ -57,38 +57,38 @@ export const TeamDashboard = ({
     >
       {/* Header: Name and Status */}
       <div className="flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          <div className="p-1.5 rounded-lg bg-muted/50 text-lg lg:text-xl shadow-sm">
+        <div className="flex items-center gap-2 lg:gap-3">
+          <div className="p-1.5 lg:p-2 rounded-lg bg-muted/50 text-xl lg:text-3xl shadow-sm">
             {team.emoji}
           </div>
           <div>
-            <h3 className="font-black text-sm lg:text-base tracking-tight leading-tight" style={{ color: isCurrentTurn ? team.color : 'white' }}>
+            <h3 className="font-black text-base lg:text-xl tracking-tight leading-tight" style={{ color: isCurrentTurn ? team.color : 'white' }}>
               {team.name}
             </h3>
-            <div className="flex items-center gap-1.5 mt-0.5">
-              <CheckCircle2 size={10} className="text-green-600 lg:w-3 lg:h-3" />
-              <span className="text-[9px] lg:text-[10px] font-bold text-muted-foreground uppercase tracking-widest">
+            <div className="flex items-center gap-1.5 mt-0.5 lg:mt-1">
+              <CheckCircle2 size={12} className="text-green-600 lg:w-5 lg:h-5" />
+              <span className="text-[10px] lg:text-sm font-bold text-muted-foreground uppercase tracking-widest">
                 {finishedCount} / {totalCount} 골인
               </span>
             </div>
           </div>
         </div>
         {isCurrentTurn && (
-          <Badge className="bg-primary hover:bg-primary shadow-md animate-pulse px-2 py-0.5 font-black text-[9px] lg:text-[10px] uppercase">
+          <Badge className="bg-primary hover:bg-primary shadow-md animate-pulse px-2 py-0.5 lg:px-3 lg:py-1 font-black text-[10px] lg:text-sm uppercase">
             Turn
           </Badge>
         )}
       </div>
 
       {/* Piece Status Lists */}
-      <div className="grid grid-cols-2 gap-2 mt-0.5 lg:mt-1">
+      <div className="grid grid-cols-2 gap-2 lg:gap-3 mt-0.5 lg:mt-1">
         {/* Waiting Pieces (Not yet out) */}
-        <div className="bg-muted/20 p-1.5 lg:p-2 rounded-lg border border-transparent hover:border-muted-foreground/10 transition-all">
-          <div className="flex items-center gap-1 mb-1 lg:mb-1.5">
-            <Home size={10} className="text-gray-400 lg:w-3 lg:h-3" />
-            <span className="text-[9px] lg:text-[10px] font-black text-gray-400 uppercase tracking-tighter">안 나온 말</span>
+        <div className="bg-muted/20 p-2 lg:p-3 rounded-lg border border-transparent hover:border-muted-foreground/10 transition-all">
+          <div className="flex items-center gap-1 mb-1 lg:mb-2">
+            <Home size={12} className="text-gray-400 lg:w-4 lg:h-4" />
+            <span className="text-[10px] lg:text-sm font-black text-gray-400 uppercase tracking-tighter">안 나온 말</span>
           </div>
-          <div className="flex flex-wrap gap-1 lg:gap-1.5 relative">
+          <div className="flex flex-wrap gap-1 lg:gap-2 relative">
             {waitingPieces.length > 0 ? (
               waitingPieces.map((p) => (
                 <div key={p.id} className="relative">
@@ -103,7 +103,7 @@ export const TeamDashboard = ({
                         onPointerDown={(e) => isCurrentTurn && onDragStart?.(p.id, e)}
                         onClick={() => isCurrentTurn && onSelectPiece?.(p.id)}
                         disabled={!isCurrentTurn}
-                        className={`w-6 h-6 lg:w-7 lg:h-7 rounded-full flex items-center justify-center text-xs lg:text-sm shadow-sm border-2 transition-all ${
+                        className={`w-7 h-7 lg:w-10 lg:h-10 rounded-full flex items-center justify-center text-sm lg:text-lg shadow-sm border-2 transition-all ${
                           selectedPieceId === p.id 
                           ? 'scale-110 border-primary shadow-md ring-2 ring-primary/20 ring-offset-1' 
                           : 'border-white/50 hover:scale-105 active:scale-95'
@@ -120,7 +120,7 @@ export const TeamDashboard = ({
                       sideOffset={8}
                     >
                       <div className="animate-in fade-in zoom-in-95 duration-200 origin-bottom">
-                        <div className="bg-white p-1 rounded-xl shadow-2xl border-2 border-primary/20 flex gap-1 whitespace-nowrap min-w-[150px] lg:min-w-[180px] justify-center backdrop-blur-md bg-white/95">
+                        <div className="bg-white p-1 rounded-xl shadow-2xl border-2 border-primary/20 flex gap-1 whitespace-nowrap min-w-[160px] lg:min-w-[220px] justify-center backdrop-blur-md bg-white/95">
                           {moveOptions.map((opt) => (
                             <button
                               key={opt.label}
@@ -128,7 +128,7 @@ export const TeamDashboard = ({
                                 e.stopPropagation();
                                 onMoveOption?.(p.id, opt.steps);
                               }}
-                              className="w-6 h-6 lg:w-7 lg:h-7 rounded-full text-[9px] lg:text-[10px] font-black flex items-center justify-center text-white shadow-sm hover:scale-110 active:scale-90 transition-transform"
+                              className="w-7 h-7 lg:w-10 lg:h-10 rounded-full text-[10px] lg:text-sm font-black flex items-center justify-center text-white shadow-sm hover:scale-110 active:scale-90 transition-transform"
                               style={{ backgroundColor: opt.color }}
                             >
                               {opt.label}
@@ -143,22 +143,22 @@ export const TeamDashboard = ({
                 </div>
               ))
             ) : (
-              <span className="text-[8px] lg:text-[9px] text-muted-foreground/50 font-medium tracking-tight">모든 말 출발</span>
+              <span className="text-[9px] lg:text-xs text-muted-foreground/50 font-medium tracking-tight">모든 말 출발</span>
             )}
           </div>
         </div>
 
         {/* Active Pieces (Count Only) */}
-        <div className="bg-primary/5 p-1.5 lg:p-2 rounded-lg border border-primary/5 hover:border-primary/10 transition-all flex flex-col items-center justify-center">
+        <div className="bg-primary/5 p-2 lg:p-3 rounded-lg border border-primary/5 hover:border-primary/10 transition-all flex flex-col items-center justify-center">
           <div className="flex items-center gap-1 mb-0.5 lg:mb-1">
-            <PlayCircle size={10} className="text-primary lg:w-3 lg:h-3" />
-            <span className="text-[9px] lg:text-[10px] font-black text-primary uppercase tracking-tighter">말판 위</span>
+            <PlayCircle size={12} className="text-primary lg:w-5 lg:h-5" />
+            <span className="text-[10px] lg:text-sm font-black text-primary uppercase tracking-tighter">말판 위</span>
           </div>
           <div className="flex items-baseline gap-1">
-            <span className="text-lg lg:text-xl font-black text-primary leading-none">
+            <span className="text-xl lg:text-3xl font-black text-primary leading-none">
               {activePieces.length}
             </span>
-            <span className="text-[9px] lg:text-[10px] font-bold text-primary/60">동</span>
+            <span className="text-[10px] lg:text-sm font-bold text-primary/60">동</span>
           </div>
         </div>
       </div>
@@ -168,13 +168,13 @@ export const TeamDashboard = ({
         <Button 
           onClick={onNextTurn} 
           disabled={!onNextTurn}
-          className="w-full font-black text-xs lg:text-sm h-9 lg:h-10 shadow-lg hover:shadow-xl transition-all active:scale-[0.98] rounded-lg flex items-center justify-center gap-1 lg:gap-1.5 mt-0.5 lg:mt-1"
+          className="w-full font-black text-sm lg:text-lg h-10 lg:h-12 shadow-lg hover:shadow-xl transition-all active:scale-[0.98] rounded-lg flex items-center justify-center gap-1 lg:gap-2 mt-0.5 lg:mt-2"
           style={{ 
             backgroundColor: team.color, 
             boxShadow: `0 4px 15px ${team.color}30` 
           }}
         >
-          턴 넘기기 <ChevronRight size={14} className="lg:w-[18px] lg:h-[18px]" />
+          턴 넘기기 <ChevronRight size={16} className="lg:w-6 lg:h-6" />
         </Button>
       )}
     </div>
