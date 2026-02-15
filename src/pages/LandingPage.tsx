@@ -4,11 +4,15 @@ import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import heroBg from '@/assets/hero-bg.png';
 import GameplayPreview from '@/components/landing/GameplayPreview';
-import { MousePointer2, Zap, Layout, Trophy, Users, PlayCircle, Eye, MousePointerClick } from 'lucide-react';
+import CaptureNarrator from '@/components/board/CaptureNarrator';
+import GoalNarrator from '@/components/board/GoalNarrator';
+import { MousePointer2, Zap, Layout, Trophy, Users, PlayCircle, Eye, MousePointerClick, Sparkles } from 'lucide-react';
 
 const LandingPage = () => {
   const navigate = useNavigate();
   const [mounted, setMounted] = useState(false);
+  const [demoCapture, setDemoCapture] = useState<{id: string, count: number} | null>(null);
+  const [demoGoal, setDemoGoal] = useState<{id: string, count: number} | null>(null);
 
   useEffect(() => {
     setMounted(true);
@@ -132,6 +136,60 @@ const LandingPage = () => {
 
         <div className="relative">
           <GameplayPreview />
+        </div>
+      </section>
+
+      {/* Visual Impact Showcase Section */}
+      <section className="relative z-10 w-full max-w-6xl px-6 py-20 border-t border-white/5 bg-gradient-to-b from-transparent to-blue-900/10">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
+          <div>
+            <div className="flex items-center gap-2 text-amber-400 mb-4">
+              <Sparkles className="w-5 h-5" />
+              <span className="text-sm font-bold tracking-widest uppercase">Visual Impact</span>
+            </div>
+            <h2 className="text-4xl md:text-5xl font-black tracking-tighter mb-6">터지는 <span className="text-amber-400">도파민</span>,<br />확실한 피드백</h2>
+            <p className="text-gray-400 leading-relaxed mb-8">
+              게임의 결정적인 순간을 더욱 짜릿하게 만들어주는 화려한 이팩트를 경험해보세요. 
+              상대방의 말을 잡거나 골인에 성공했을 때, 화면을 가득 채우는 시원한 연출이 승리의 기쁨을 배가시킵니다.
+            </p>
+            
+            <div className="flex flex-wrap gap-4">
+              <Button 
+                onClick={() => setDemoCapture({ id: Date.now().toString(), count: 2 })}
+                className="h-14 px-8 rounded-xl bg-white/5 border border-white/10 hover:bg-white/10 hover:border-white/20 text-white font-bold backdrop-blur-md transition-all active:scale-95"
+              >
+                💥 잡기 이팩트 체험
+              </Button>
+              <Button 
+                onClick={() => setDemoGoal({ id: Date.now().toString(), count: 1 })}
+                className="h-14 px-8 rounded-xl bg-amber-500/10 border border-amber-500/20 hover:bg-amber-500/20 hover:border-amber-500/30 text-amber-400 font-bold backdrop-blur-md transition-all active:scale-95"
+              >
+                🏁 골인 이팩트 체험
+              </Button>
+            </div>
+          </div>
+          
+          <div className="relative aspect-video rounded-3xl overflow-hidden bg-slate-900/50 border border-white/10 shadow-2xl flex items-center justify-center group">
+            <div className="absolute inset-0 bg-gradient-to-br from-blue-500/10 via-transparent to-amber-500/10 group-hover:opacity-75 transition-opacity" />
+            <p className="text-white/30 font-bold text-lg">Animation Area</p>
+            
+            {/* Demo Narrators */}
+            {demoCapture && (
+              <CaptureNarrator 
+                capturingTeam="Blue Team" 
+                capturedTeam="Red Team" 
+                count={demoCapture.count} 
+                id={demoCapture.id} 
+              />
+            )}
+            {demoGoal && (
+              <GoalNarrator 
+                teamName="Blue Team" 
+                count={demoGoal.count} 
+                id={demoGoal.id} 
+              />
+            )}
+          </div>
         </div>
       </section>
 
