@@ -39,9 +39,27 @@ export const GameplayPreview = () => {
       const movedPiece = prev.find(p => p.id === pieceId);
       if (!movedPiece) return prev;
 
-      // 1. 이동 처리
+      // 1. 함께 이동할 말 찾기 (업기)
+      const stackIds = prev
+        .filter(p => 
+          p.team === movedPiece.team && 
+          p.nodeId === movedPiece.nodeId && 
+          !p.isFinished && 
+          movedPiece.nodeId !== null // 대기 상태인 말은 같이 움직이지 않음 (개별 출발)
+        )
+        .map(p => p.id);
+      
+      // 출발하는 말(nodeId가 null)인 경우 자기 자신만 이동
+      if (movedPiece.nodeId === null) {
+        stackIds.push(movedPiece.id); 
+      }
+      
+      // 중복 제거 (대기 상태가 아닌 경우 위 필터에 포함되지만 안전하게)
+      const uniqueStackIds = [...new Set(stackIds)];
+
+      // 2. 이동 처리
       let newPieces = prev.map(p => {
-        if (p.id === pieceId) {
+        if (uniqueStackIds.includes(p.id)) {
           if (isGoalMove) return { ...p, nodeId: null, isFinished: true };
           return { ...p, nodeId: targetNodeId };
         }
