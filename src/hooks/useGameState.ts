@@ -44,10 +44,12 @@ export function initializeGame(teams: TeamConfig[]): GameState {
   const state: GameState = {
     teams,
     pieces: createInitialPieces(teams),
-    logs: [`🎮 게임 시작! ${teamNames}`],
+    logs: [`🎮 게임 시작! ${teamNames}`, `🎲 먼저 시작할 팀을 선택해주세요.`],
     currentTurn: teams[0].id,
     stats: stats as Record<TeamId, TeamStats>,
-    winnerId: null
+    winnerId: null,
+    status: 'first_turn',
+    startTime: undefined
   };
   saveState(state);
   
@@ -269,5 +271,19 @@ export function useGameState() {
     trackEvent({ category: 'Game', action: 'game_reset' });
   }, []);
 
-  return { gameState, setGameState, movePiece, nextTurn, resetGame, restartGame };
+  const setFirstTurn = useCallback((teamId: TeamId) => {
+    setGameState(prev => {
+      if (!prev) return null;
+      const team = prev.teams.find(t => t.id === teamId);
+      return {
+        ...prev,
+        currentTurn: teamId,
+        status: 'playing',
+        startTime: Date.now(),
+        logs: [...prev.logs, `👉 ${team?.name} 팀이 먼저 시작합니다!`]
+      };
+    });
+  }, []);
+
+  return { gameState, setGameState, movePiece, nextTurn, resetGame, restartGame, setFirstTurn };
 }

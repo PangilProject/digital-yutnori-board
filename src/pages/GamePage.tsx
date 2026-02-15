@@ -12,13 +12,15 @@ import { OnboardingTooltip } from '@/components/board/OnboardingTooltip';
 import { useYutBoardLogic } from '@/hooks/useYutBoardLogic';
 import CaptureNarrator from '@/components/board/CaptureNarrator';
 import GoalNarrator from '@/components/board/GoalNarrator';
+import { GameTimer } from '@/components/board/GameTimer';
+import { FirstTurnSelection } from '@/components/board/FirstTurnSelection';
 import { cn } from '@/lib/utils';
 import heroBg from '@/assets/hero-bg.png';
 import { RefreshCcw } from 'lucide-react';
 
 const GamePage = () => {
   const navigate = useNavigate();
-  const { gameState, movePiece, nextTurn, resetGame, restartGame } = useGameState();
+  const { gameState, movePiece, nextTurn, resetGame, restartGame, setFirstTurn } = useGameState();
   const { currentStep, isVisible, completeStep, skipOnboarding } = useOnboarding();
   const svgRef = useRef<SVGSVGElement>(null);
 
@@ -127,7 +129,9 @@ const GamePage = () => {
             </h1>
           </div>
           
+          
           <div className="flex items-center gap-2">
+            <GameTimer startTime={gameState.startTime} />
             <HelpModal />
             <ConfirmModal
               title="게임 초기화"
@@ -253,6 +257,13 @@ const GamePage = () => {
 
         </div>
       </div>
+
+      {gameState.status === 'first_turn' && (
+        <FirstTurnSelection 
+          teams={gameState.teams}
+          onSelect={setFirstTurn}
+        />
+      )}
 
       {/* Capture Overlay */}
       {gameState.lastCapture && (

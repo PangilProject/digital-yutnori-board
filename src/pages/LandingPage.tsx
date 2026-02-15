@@ -107,7 +107,7 @@ const LandingPage = () => {
               </Button>
               
               <button 
-                className="h-14 px-8 text-white/70 hover:text-white font-semibold transition-colors flex items-center gap-2"
+                className="h-14 px-8 text-white/70 hover:text-white font-semibold transition-colors flex items-center gap-2 border border-white/40 rounded-2xl border-2 "
                 onClick={() => {
                   const featuresEl = document.getElementById('live-experience');
                   featuresEl?.scrollIntoView({ behavior: 'smooth' });

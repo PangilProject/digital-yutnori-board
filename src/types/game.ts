@@ -42,6 +42,8 @@ export interface TeamStats {
 }
 
 export interface GameState {
+  status: 'first_turn' | 'playing' | 'finished';
+  startTime?: number;
   teams: TeamConfig[];
   pieces: Piece[];
   logs: string[];
