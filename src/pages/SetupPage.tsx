@@ -54,13 +54,23 @@ const SetupPage = () => {
     <div className="min-h-screen flex items-center justify-center p-4"
       style={{ background: 'linear-gradient(135deg, hsl(35, 45%, 88%) 0%, hsl(25, 40%, 82%) 50%, hsl(35, 35%, 85%) 100%)' }}>
       <Card className="w-full max-w-lg shadow-2xl border-2 border-border relative">
+        <div className="absolute top-4 left-4 z-20">
+          <Button 
+            variant="ghost" 
+            size="sm" 
+            onClick={() => navigate('/')}
+            className="text-muted-foreground hover:text-foreground flex items-center gap-1"
+          >
+            ← 홈으로
+          </Button>
+        </div>
         <div className="absolute top-4 right-4 z-20">
           <HelpModal />
         </div>
         <CardHeader className="text-center pb-4">
           <div className="text-5xl mb-2">🎲</div>
-          <CardTitle className="text-3xl font-extrabold tracking-tight text-foreground">윷놀이</CardTitle>
-          <p className="text-muted-foreground mt-1">디지털 말판 · 자유 이동 모드</p>
+          <CardTitle className="text-3xl font-extrabold tracking-tight text-foreground">게임 설정</CardTitle>
+          <p className="text-muted-foreground mt-1">함께 즐길 팀과 규칙을 정해봅시다</p>
         </CardHeader>
         <CardContent className="space-y-5">
           {/* Team count selector */}
