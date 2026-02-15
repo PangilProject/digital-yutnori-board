@@ -3,6 +3,7 @@ import { TeamConfig, Piece } from "@/types/game";
 import { Badge } from "@/components/ui/badge";
 import { Home, PlayCircle, CheckCircle2, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 
 interface TeamDashboardProps {
   team: TeamConfig;
@@ -91,23 +92,33 @@ export const TeamDashboard = ({
             {waitingPieces.length > 0 ? (
               waitingPieces.map((p) => (
                 <div key={p.id} className="relative">
-                  <button 
-                    onPointerDown={(e) => isCurrentTurn && onDragStart?.(p.id, e)}
-                    onClick={() => isCurrentTurn && onSelectPiece?.(p.id)}
-                    disabled={!isCurrentTurn}
-                    className={`w-6 h-6 lg:w-7 lg:h-7 rounded-full flex items-center justify-center text-xs lg:text-sm shadow-sm border-2 transition-all ${
-                      selectedPieceId === p.id 
-                      ? 'scale-110 border-primary shadow-md ring-2 ring-primary/20 ring-offset-1' 
-                      : 'border-white/50 hover:scale-105 active:scale-95'
-                    } ${!isCurrentTurn ? 'cursor-not-allowed grayscale' : ''}`}
-                    style={{ backgroundColor: team.colorLight }}
+                  <Popover 
+                    open={selectedPieceId === p.id && isCurrentTurn} 
+                    onOpenChange={(open) => {
+                      if (!open) onSelectPiece?.(null);
+                    }}
                   >
-                    {team.emoji}
-                  </button>
+                    <PopoverTrigger asChild>
+                      <button 
+                        onPointerDown={(e) => isCurrentTurn && onDragStart?.(p.id, e)}
+                        onClick={() => isCurrentTurn && onSelectPiece?.(p.id)}
+                        disabled={!isCurrentTurn}
+                        className={`w-6 h-6 lg:w-7 lg:h-7 rounded-full flex items-center justify-center text-xs lg:text-sm shadow-sm border-2 transition-all ${
+                          selectedPieceId === p.id 
+                          ? 'scale-110 border-primary shadow-md ring-2 ring-primary/20 ring-offset-1' 
+                          : 'border-white/50 hover:scale-105 active:scale-95'
+                        } ${!isCurrentTurn ? 'cursor-not-allowed grayscale' : ''}`}
+                        style={{ backgroundColor: team.colorLight }}
+                      >
+                        {team.emoji}
+                      </button>
+                    </PopoverTrigger>
 
-                  {/* Dashboard Tulip Menu (MoveMenu) */}
-                  {selectedPieceId === p.id && isCurrentTurn && (
-                    <div className="absolute bottom-[calc(100%+8px)] left-1/2 -translate-x-1/2 z-[50] pointer-events-auto w-max">
+                    <PopoverContent 
+                      className="w-auto p-0 border-none bg-transparent shadow-none" 
+                      side="top" 
+                      sideOffset={8}
+                    >
                       <div className="animate-in fade-in zoom-in-95 duration-200 origin-bottom">
                         <div className="bg-white p-1 rounded-xl shadow-2xl border-2 border-primary/20 flex gap-1 whitespace-nowrap min-w-[150px] lg:min-w-[180px] justify-center backdrop-blur-md bg-white/95">
                           {moveOptions.map((opt) => (
@@ -127,8 +138,8 @@ export const TeamDashboard = ({
                           <div className="absolute top-[100%] left-1/2 -translate-x-1/2 w-0 h-0 border-l-[6px] border-l-transparent border-r-[6px] border-r-transparent border-t-[6px] border-t-white/95" />
                         </div>
                       </div>
-                    </div>
-                  )}
+                    </PopoverContent>
+                  </Popover>
                 </div>
               ))
             ) : (
