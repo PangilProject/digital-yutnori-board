@@ -64,26 +64,26 @@ const GameResult: React.FC<GameResultProps> = ({ gameState, onRestart, onHome })
 
   return (
     <div className={`fixed inset-0 z-50 flex items-center justify-center p-4 transition-all duration-700 ${show ? 'bg-black/40 backdrop-blur-md opacity-100' : 'bg-black/0 backdrop-blur-none opacity-0'}`}>
-      <div className={`bg-white rounded-[2rem] shadow-[0_32px_80px_-16px_rgba(0,0,0,0.15)] w-full max-w-2xl overflow-hidden transition-all duration-700 transform ${show ? 'scale-100 translate-y-0' : 'scale-95 translate-y-12'}`}>
+      <div className={`bg-white rounded-[1.5rem] md:rounded-[2rem] shadow-[0_32px_80px_-16px_rgba(0,0,0,0.15)] w-full max-w-2xl max-h-[90vh] overflow-y-auto transition-all duration-700 transform ${show ? 'scale-100 translate-y-0' : 'scale-95 translate-y-12'}`}>
         {/* Header - Winner Banner */}
-        <div className="relative px-8 pt-12 pb-10 text-center overflow-hidden">
+        <div className="relative px-6 py-8 md:px-8 md:pt-12 md:pb-10 text-center overflow-hidden">
           {/* Subtle light rays */}
           <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none">
             <div className="absolute top-[-40%] left-[-10%] w-[60%] h-[150%] bg-gradient-to-tr from-transparent via-slate-50 to-transparent rotate-[35deg] blur-2xl animate-pulse" />
           </div>
           
-          <div className="relative inline-flex items-center justify-center w-28 h-28 bg-white rounded-full mb-6 shadow-[0_8px_30px_rgba(0,0,0,0.06)] border border-slate-50 animate-bounce" style={{ animationDuration: '4s' }}>
+          <div className="relative inline-flex items-center justify-center w-20 h-20 md:w-28 md:h-28 bg-white rounded-full mb-4 md:mb-6 shadow-[0_8px_30px_rgba(0,0,0,0.06)] border border-slate-50 animate-bounce" style={{ animationDuration: '4s' }}>
             <div className={`absolute inset-0 rounded-full animate-ping opacity-20`} style={{ backgroundColor: winner.color }} />
-            <Trophy size={56} className="text-yellow-400 drop-shadow-sm" />
+            <Trophy size={40} className="text-yellow-400 drop-shadow-sm md:w-[56px] md:h-[56px]" />
           </div>
           
           <div className="relative">
-            <h2 className="text-6xl font-black mb-3 tracking-tighter text-slate-900">
+            <h2 className="text-4xl md:text-6xl font-black mb-2 md:mb-3 tracking-tighter text-slate-900">
               VICTORY!
             </h2>
-            <div className="inline-flex items-center gap-2 px-6 py-2 rounded-full shadow-sm border border-slate-100 bg-white">
-              <span className="text-2xl">{winner.emoji}</span>
-              <p className="text-xl font-black uppercase tracking-widest" style={{ color: winner.color }}>
+            <div className="inline-flex items-center gap-2 px-4 py-1.5 md:px-6 md:py-2 rounded-full shadow-sm border border-slate-100 bg-white">
+              <span className="text-xl md:text-2xl">{winner.emoji}</span>
+              <p className="text-lg md:text-xl font-black uppercase tracking-widest" style={{ color: winner.color }}>
                 {winner.name} 팀 승리!
               </p>
             </div>
@@ -91,14 +91,14 @@ const GameResult: React.FC<GameResultProps> = ({ gameState, onRestart, onHome })
         </div>
 
         {/* Content - Stats Summary (Refined with Section Grouping) */}
-        <div className="bg-slate-50/60 p-8 md:p-10 border-y border-slate-100">
-          <div className="flex items-center gap-4 mb-8">
+        <div className="bg-slate-50/60 p-6 md:p-10 border-y border-slate-100">
+          <div className="flex items-center gap-4 mb-6 md:mb-8">
             <div className="h-[1px] flex-1 bg-slate-200/60" />
-            <h3 className="text-[11px] font-black text-slate-400 uppercase tracking-[0.4em]">Match Stats</h3>
+            <h3 className="text-[10px] md:text-[11px] font-black text-slate-400 uppercase tracking-[0.4em]">Match Stats</h3>
             <div className="h-[1px] flex-1 bg-slate-200/60" />
           </div>
           
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
             {gameState.teams.map(team => {
               const stats = gameState.stats?.[team.id];
               const isWinner = team.id === winner.id;
@@ -106,33 +106,33 @@ const GameResult: React.FC<GameResultProps> = ({ gameState, onRestart, onHome })
               return (
                 <div 
                   key={team.id}
-                  className={`relative p-6 rounded-[1.5rem] transition-all duration-500 border-2 ${
+                  className={`relative p-5 md:p-6 rounded-2xl md:rounded-[1.5rem] transition-all duration-500 border-2 ${
                     isWinner 
                       ? 'bg-white border-slate-900/5 shadow-[0_12px_24px_-8px_rgba(0,0,0,0.08)] scale-[1.02] z-10' 
                       : 'bg-slate-50/50 border-transparent hover:bg-white hover:border-slate-100/50 hover:shadow-lg hover:-translate-y-1'
                   }`}
                 >
-                  <div className="flex items-center justify-between mb-5">
-                    <div className="flex items-center gap-3">
-                      <div className={`w-10 h-10 rounded-xl flex items-center justify-center text-xl border ${isWinner ? 'bg-slate-50/50 border-slate-100' : 'bg-white border-slate-100'}`}>
+                  <div className="flex items-center justify-between mb-4 md:mb-5">
+                    <div className="flex items-center gap-2 md:gap-3">
+                      <div className={`w-8 h-8 md:w-10 md:h-10 rounded-lg md:rounded-xl flex items-center justify-center text-lg md:text-xl border ${isWinner ? 'bg-slate-50/50 border-slate-100' : 'bg-white border-slate-100'}`}>
                         {team.emoji}
                       </div>
-                      <span className={`font-black text-lg tracking-tight ${isWinner ? 'text-slate-800' : 'text-slate-600'}`}>
+                      <span className={`font-black text-base md:text-lg tracking-tight ${isWinner ? 'text-slate-800' : 'text-slate-600'}`}>
                         {team.name}
                       </span>
                     </div>
                     {isWinner && (
-                      <div className="px-2.5 py-1 bg-slate-900 text-white text-[10px] font-black rounded-lg uppercase tracking-widest">
+                      <div className="px-2 py-0.5 md:px-2.5 md:py-1 bg-slate-900 text-white text-[9px] md:text-[10px] font-black rounded-md md:rounded-lg uppercase tracking-widest">
                         Winner
                       </div>
                     )}
                   </div>
                   
-                  <div className="grid grid-cols-2 gap-x-4 gap-y-4">
-                    <StatItem icon={<Footprints size={14} />} label="이동" value={stats?.moveCount || 0} color={team.color} active={isWinner} />
-                    <StatItem icon={<Swords size={14} />} label="잡기" value={stats?.captureCount || 0} color={team.color} active={isWinner} />
-                    <StatItem icon={<Layers size={14} />} label="업기" value={stats?.stackCount || 0} color={team.color} active={isWinner} />
-                    <StatItem icon={<Trophy size={14} />} label="완주" value={`${stats?.finishedCount || 0}/${team.pieceCount}`} color={team.color} active={isWinner} />
+                  <div className="grid grid-cols-2 gap-x-3 gap-y-3 md:gap-x-4 md:gap-y-4">
+                    <StatItem icon={<Footprints size={12} className="md:w-[14px] md:h-[14px]" />} label="이동" value={stats?.moveCount || 0} color={team.color} active={isWinner} />
+                    <StatItem icon={<Swords size={12} className="md:w-[14px] md:h-[14px]" />} label="잡기" value={stats?.captureCount || 0} color={team.color} active={isWinner} />
+                    <StatItem icon={<Layers size={12} className="md:w-[14px] md:h-[14px]" />} label="업기" value={stats?.stackCount || 0} color={team.color} active={isWinner} />
+                    <StatItem icon={<Trophy size={12} className="md:w-[14px] md:h-[14px]" />} label="완주" value={`${stats?.finishedCount || 0}/${team.pieceCount}`} color={team.color} active={isWinner} />
                   </div>
                 </div>
               );
@@ -141,25 +141,25 @@ const GameResult: React.FC<GameResultProps> = ({ gameState, onRestart, onHome })
         </div>
 
         {/* Actions - Footer Section */}
-        <div className="p-8 md:px-10 md:py-8 bg-white">
-          <div className="flex flex-col sm:flex-row gap-4">
+        <div className="p-6 md:px-10 md:py-8 bg-white">
+          <div className="flex flex-col sm:flex-row gap-3 md:gap-4">
             <Button 
               onClick={handleRestart}
-              className="flex-[2] h-16 text-xl font-black gap-3 rounded-2xl shadow-xl transition-all duration-300 transform hover:scale-[1.02] active:scale-[0.98] text-white"
+              className="flex-[2] h-14 md:h-16 text-lg md:text-xl font-black gap-2 md:gap-3 rounded-xl md:rounded-2xl shadow-xl transition-all duration-300 transform hover:scale-[1.02] active:scale-[0.98] text-white"
               style={{ 
                 background: winner.color,
                 boxShadow: `0 12px 30px -8px ${winner.color}60`
               }}
             >
-              <RotateCcw size={22} />
+              <RotateCcw size={20} className="md:w-[22px] md:h-[22px]" />
               다시 게임하기
             </Button>
             <Button 
               variant="outline" 
               onClick={handleHome}
-              className="flex-1 h-16 text-lg font-bold gap-2 rounded-2xl border-2 border-slate-200 hover:bg-slate-50 transition-all text-slate-600"
+              className="flex-1 h-14 md:h-16 text-base md:text-lg font-bold gap-2 rounded-xl md:rounded-2xl border-2 border-slate-200 hover:bg-slate-50 transition-all text-slate-600"
             >
-              <Home size={20} />
+              <Home size={18} className="md:w-[20px] md:h-[20px]" />
               메인으로
             </Button>
           </div>

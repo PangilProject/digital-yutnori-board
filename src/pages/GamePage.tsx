@@ -18,6 +18,21 @@ import { cn } from '@/lib/utils';
 import heroBg from '@/assets/hero-bg.png';
 import { RefreshCcw } from 'lucide-react';
 
+const ONBOARDING_STEPS_CONTENT = {
+  game_start: {
+    title: "게임 시작!",
+    content: "이제 본격적으로 게임을 시작합니다. 우측 대시보드에서 말을 선택하여 보드판으로 진출시켜보세요."
+  },
+  game_move_piece: {
+    title: "말 선택 및 이동",
+    content: "'안 나온 말' 아이콘을 클릭하여 이동 메뉴를 열어보세요. 대시보드에서 바로 조작할 수 있습니다."
+  },
+  game_next_turn: {
+    title: "턴 넘기기",
+    content: "말을 모두 이동시켰다면 팀보드 하단 버튼을 눌러 상대 팀에게 기회를 넘겨주세요."
+  }
+} as const;
+
 const GamePage = () => {
   const navigate = useNavigate();
   const { gameState, movePiece, nextTurn, resetGame, restartGame, setTeamOrder } = useGameState();
@@ -193,18 +208,10 @@ const GamePage = () => {
                 svgRef={svgRef}
               />
               
+              
               {/* Board Overlays / Tooltips */}
               <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-1 h-1">
-                <OnboardingTooltip 
-                  isVisible={isVisible}
-                  step={currentStep}
-                  targetStep="game_start"
-                  title="게임 시작!"
-                  content="이제 본격적으로 게임을 시작합니다. 우측 대시보드에서 말을 선택하여 보드판으로 진출시켜보세요."
-                  onNext={() => completeStep('game_start')}
-                  onSkip={skipOnboarding}
-                  position="top"
-                />
+                {/* Tooltip removed from here */}
               </div>
             </div>
           </div>
@@ -258,30 +265,8 @@ const GamePage = () => {
                   onDragStart={handleDashboardDragStart}
                 />
                 
-                {/* Move Piece Tooltip - Points to the Dashboard */}
-                <div className="absolute top-1/2 right-[calc(100%+20px)] w-0 h-0">
-                  <OnboardingTooltip 
-                    isVisible={isVisible && gameState.currentTurn === team.id}
-                    step={currentStep}
-                    targetStep="game_move_piece"
-                    title="말 선택 및 이동"
-                    content="'안 나온 말' 아이콘을 클릭하여 이동 메뉴를 열어보세요. 대시보드에서 바로 조작할 수 있습니다."
-                    onNext={() => completeStep('game_move_piece')}
-                    onSkip={skipOnboarding}
-                    position="left"
-                  />
-                </div>
-
-                <OnboardingTooltip 
-                  isVisible={isVisible && gameState.currentTurn === team.id}
-                  step={currentStep}
-                  targetStep="game_next_turn"
-                  title="턴 넘기기"
-                  content="말을 모두 이동시켰다면 팀보드 하단 버튼을 눌러 상대 팀에게 기회를 넘겨주세요."
-                  onNext={() => completeStep('game_next_turn')}
-                  onSkip={skipOnboarding}
-                  position="top"
-                />
+                
+                {/* Move Piece Tooltip - Points to the Dashboard - Removed */}
               </div>
             ))}
           </div>
@@ -311,7 +296,7 @@ const GamePage = () => {
       )}
 
       {/* Goal Overlay */}
-      {gameState.lastGoal && (
+      {gameState.lastGoal && !gameState.winnerId && (
         <GoalNarrator 
           {...gameState.lastGoal}
         />
@@ -323,6 +308,19 @@ const GamePage = () => {
           gameState={gameState} 
           onRestart={handleRestart} 
           onHome={handleHome} 
+        />
+      )}
+
+      {/* Onboarding Tooltip (Fixed Position) */}
+      {gameState.status !== 'first_turn' && currentStep && currentStep in ONBOARDING_STEPS_CONTENT && (
+        <OnboardingTooltip
+          isVisible={isVisible}
+          step={currentStep}
+          targetStep={currentStep}
+          title={ONBOARDING_STEPS_CONTENT[currentStep as keyof typeof ONBOARDING_STEPS_CONTENT].title}
+          content={ONBOARDING_STEPS_CONTENT[currentStep as keyof typeof ONBOARDING_STEPS_CONTENT].content}
+          onNext={() => completeStep(currentStep)}
+          onSkip={skipOnboarding}
         />
       )}
       </div>

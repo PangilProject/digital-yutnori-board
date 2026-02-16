@@ -11,7 +11,6 @@ interface OnboardingTooltipProps {
   content: string;
   onNext: () => void;
   onSkip: () => void;
-  position?: 'top' | 'bottom' | 'left' | 'right';
   className?: string;
 }
 
@@ -23,42 +22,24 @@ export const OnboardingTooltip = ({
   content,
   onNext,
   onSkip,
-  position = 'bottom',
   className = ''
 }: OnboardingTooltipProps) => {
   if (!isVisible || step !== targetStep) return null;
 
-  const positionClasses = {
-    top: 'bottom-full mb-4 left-1/2 -translate-x-1/2',
-    bottom: 'top-full mt-4 left-1/2 -translate-x-1/2',
-    left: 'right-full mr-4 top-1/2 -translate-y-1/2',
-    right: 'left-full ml-4 top-1/2 -translate-y-1/2',
-  };
-
-  const arrowClasses = {
-    top: 'top-full left-1/2 -translate-x-1/2 border-t-primary border-x-transparent border-b-transparent',
-    bottom: 'bottom-full left-1/2 -translate-x-1/2 border-b-primary border-x-transparent border-t-transparent',
-    left: 'left-full top-1/2 -translate-y-1/2 border-l-primary border-y-transparent border-r-transparent',
-    right: 'right-full top-1/2 -translate-y-1/2 border-r-primary border-y-transparent border-l-transparent',
-  };
-
   return (
     <AnimatePresence>
       <motion.div
-        initial={{ opacity: 0, scale: 0.9, y: position === 'bottom' ? -10 : 10 }}
-        animate={{ opacity: 1, scale: 1, y: 0 }}
-        exit={{ opacity: 0, scale: 0.9 }}
-        className={`absolute z-[100] w-[calc(100vw-40px)] max-w-64 p-4 bg-primary text-primary-foreground rounded-xl shadow-2xl ${positionClasses[position]} ${className}`}
+        initial={{ opacity: 0, y: 20, x: '-50%' }}
+        animate={{ opacity: 1, y: 0, x: '-50%' }}
+        exit={{ opacity: 0, y: 20, x: '-50%' }}
+        className={`fixed bottom-8 left-1/2 z-[100] w-[calc(100vw-40px)] max-w-sm p-5 bg-slate-900/95 text-white rounded-xl shadow-[0_8px_30px_rgb(0,0,0,0.5)] border border-white/10 ${className}`}
       >
-        {/* Arrow */}
-        <div className={`absolute border-[8px] ${arrowClasses[position]}`} />
-
-        <div className="flex justify-between items-start mb-2">
-          <h4 className="font-bold text-sm flex items-center gap-1.5">
+        <div className="flex justify-between items-start mb-3">
+          <h4 className="font-bold text-base flex items-center gap-2 text-blue-400">
             ✨ {title}
           </h4>
-          <button onClick={onSkip} className="p-0.5 hover:bg-white/20 rounded-md transition-colors">
-            <X size={14} />
+          <button onClick={onSkip} className="p-1 hover:bg-white/10 rounded-full transition-colors text-gray-400 hover:text-white">
+            <X size={16} />
           </button>
         </div>
         

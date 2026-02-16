@@ -65,8 +65,8 @@ export const FirstTurnSelection = ({ teams, onOrderComplete }: FirstTurnSelectio
           </p>
         </CardHeader>
         
-        <CardContent className="p-6 md:p-10">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
+        <CardContent className="p-4 md:p-10">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-6 mb-6 md:mb-10">
             {teams.map((team) => {
               const selectedIdx = getSelectionIndex(team.id);
               const isPicked = selectedIdx >= 0;
@@ -82,7 +82,7 @@ export const FirstTurnSelection = ({ teams, onOrderComplete }: FirstTurnSelectio
                   <button
                     onClick={() => handleSelect(team.id)}
                     disabled={isPicked}
-                    className={`w-full h-full min-h-[220px] flex flex-col items-center justify-center p-6 rounded-3xl border-4 transition-all relative overflow-hidden group
+                    className={`w-full h-full min-h-[160px] md:min-h-[220px] flex flex-col items-center justify-center p-4 md:p-6 rounded-2xl md:rounded-3xl border-4 transition-all relative overflow-hidden group
                       ${isPicked 
                         ? 'bg-slate-900 border-white/20 opacity-100 scale-100' 
                         : 'bg-white/5 border-transparent hover:bg-white/10 hover:border-white/20'
@@ -101,7 +101,7 @@ export const FirstTurnSelection = ({ teams, onOrderComplete }: FirstTurnSelectio
                         <motion.div
                           initial={{ scale: 0, rotate: -180 }}
                           animate={{ scale: 1, rotate: 0 }}
-                          className="absolute top-4 left-4 w-12 h-12 rounded-full flex items-center justify-center text-xl font-black shadow-lg z-10 text-white border-2 border-white/20"
+                          className="absolute top-2 left-2 md:top-4 md:left-4 w-8 h-8 md:w-12 md:h-12 rounded-full flex items-center justify-center text-sm md:text-xl font-black shadow-lg z-10 text-white border-2 border-white/20"
                           style={{ backgroundColor: team.color }}
                         >
                           {rank}
@@ -110,24 +110,24 @@ export const FirstTurnSelection = ({ teams, onOrderComplete }: FirstTurnSelectio
                     </AnimatePresence>
 
                     {/* Emoji */}
-                    <span className={`text-6xl mb-6 filter drop-shadow-lg transition-transform duration-300 ${isPicked ? 'scale-110' : 'group-hover:scale-110'}`}>
+                    <span className={`text-4xl md:text-6xl mb-3 md:mb-6 filter drop-shadow-lg transition-transform duration-300 ${isPicked ? 'scale-110' : 'group-hover:scale-110'}`}>
                       {team.emoji}
                     </span>
 
                     {/* Team Name */}
-                    <span className="text-2xl font-black text-white mb-2">
+                    <span className="text-lg md:text-2xl font-black text-white mb-1 md:mb-2">
                       {team.name}
                     </span>
 
                     {/* Status Text */}
-                    <span className="text-sm font-bold uppercase tracking-wider" style={{ color: isPicked ? team.color : '#94a3b8' }}>
+                    <span className="text-xs md:text-sm font-bold uppercase tracking-wider text-nowrap" style={{ color: isPicked ? team.color : '#94a3b8' }}>
                       {isPicked ? `${rank}번 타자` : '선택하기'}
                     </span>
 
                     {/* Checkmark Overlay for selected */}
                     {isPicked && (
-                      <div className="absolute top-4 right-4 text-white/20">
-                        <Check size={32} />
+                      <div className="absolute top-2 right-2 md:top-4 md:right-4 text-white/20">
+                        <Check size={24} className="md:w-8 md:h-8" />
                       </div>
                     )}
                   </button>
