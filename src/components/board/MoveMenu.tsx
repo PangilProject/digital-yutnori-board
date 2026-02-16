@@ -22,28 +22,36 @@ const MoveMenu: React.FC<MoveMenuProps> = ({ pos, onMoveOption }) => {
     { label: '빽', steps: -1, color: 'hsl(0, 0%, 40%)' },
   ];
 
-  // 메뉴가 보드판(0~600) 밖으로 나가지 않도록 X 좌표를 제한 (메뉴 너비 약 320)
-  const menuWidth = 320;
-  const menuHeight = 80;
-  const halfWidth = menuWidth / 2;
-  const margin = 10; // 최소 여백
+  // 보드판 좌표(0~600)를 퍼센트로 변환하여 위치 설정
+  // 오른쪽 절반에 있으면 말의 오른쪽을 기준으로 정렬하여 화면 밖으로 나가는 것을 방지
+  const isRightSide = pos.x > 300;
   
-  // foreignObject는 좌상단 좌표 기준이므로 중심 보정을 위해 x - halfWidth
-  const clampedX = Math.min(Math.max(halfWidth + margin, pos.x), 600 - halfWidth - margin);
-  const x = clampedX - halfWidth;
-  
-  // 말 위치가 구석일 때 메뉴 박스가 밀리더라도 화살표는 말을 가리키도록 오프셋 계산 (HTML 내부에서 처리하거나 근사치 사용)
-  const arrowOffset = pos.x - clampedX; // 중심점으로부터의 거리
-
-  // 보드 상단(0) 밖으로 나가지 않도록 Y 좌표도 조정
-  const menuY = Math.max(90, pos.y);
-  const y = menuY - 100; // 말 위쪽으로 띄움
+  // 메뉴 전체 스타일
+  const style: React.CSSProperties = {
+    position: 'absolute',
+    top: `${(pos.y / 600) * 100}%`,
+    zIndex: 50,
+    marginTop: '-20px', // 말에서 약간 위로 띄움
+    width: '320px',
+    maxWidth: '90vw', // 모바일 폭 제한
+    pointerEvents: 'auto',
+    ...(isRightSide 
+      ? { 
+          left: `${(pos.x / 600) * 100}%`, 
+          transform: 'translate(-85%, -100%)' // 오른쪽이면 왼쪽으로 더 많이 이동
+        } 
+      : { 
+          left: `${(pos.x / 600) * 100}%`, 
+          transform: 'translate(-15%, -100%)' // 왼쪽이면 오른쪽으로 살짝 이동
+        }
+    )
+  };
 
   return (
-    <foreignObject x={x} y={y} width={menuWidth} height={menuHeight + 20} className="overflow-visible">
-      <div className="relative w-full h-full flex flex-col items-center justify-end pb-2">
+    <div style={style}>
+      <div className="relative w-full flex flex-col items-center justify-end pb-2">
         <div className="animate-in fade-in zoom-in-95 duration-200 origin-bottom">
-          <div className="bg-white p-2 rounded-xl shadow-2xl border-2 border-primary/20 flex gap-2 whitespace-nowrap min-w-[220px] justify-center backdrop-blur-md bg-white/95">
+          <div className="bg-white p-2 rounded-xl shadow-2xl border-2 border-primary/20 flex gap-2 whitespace-nowrap overflow-x-auto justify-center backdrop-blur-md bg-white/95">
             {options.map((opt) => (
               <button
                 key={opt.label}
@@ -51,10 +59,9 @@ const MoveMenu: React.FC<MoveMenuProps> = ({ pos, onMoveOption }) => {
                 onMouseDown={(e) => e.stopPropagation()}
                 onClick={(e) => {
                   e.stopPropagation();
-                  console.log('Move option clicked:', opt.steps); // Debugging
                   onMoveOption(opt.steps);
                 }}
-                className="w-10 h-10 rounded-full text-base font-black flex items-center justify-center text-white shadow-sm hover:scale-110 active:scale-90 transition-transform cursor-pointer pointer-events-auto"
+                className="w-10 h-10 flex-shrink-0 rounded-full text-base font-black flex items-center justify-center text-white shadow-sm hover:scale-110 active:scale-90 transition-transform cursor-pointer"
                 style={{ backgroundColor: opt.color }}
               >
                 {opt.label}
@@ -63,12 +70,15 @@ const MoveMenu: React.FC<MoveMenuProps> = ({ pos, onMoveOption }) => {
           </div>
           {/* Arrow pointing to piece */}
           <div 
-            className="absolute top-[calc(100%-8px)] w-0 h-0 border-l-[8px] border-l-transparent border-r-[8px] border-r-transparent border-t-[8px] border-t-white/95 filter drop-shadow-sm" 
-            style={{ left: `calc(50% + ${arrowOffset}px)`, transform: 'translateX(-50%)' }}
+            className="absolute top-[100%] w-0 h-0 border-l-[8px] border-l-transparent border-r-[8px] border-r-transparent border-t-[8px] border-t-white/95 filter drop-shadow-sm" 
+            style={{ 
+              left: isRightSide ? '85%' : '15%', 
+              transform: 'translateX(-50%)' 
+            }}
           />
         </div>
       </div>
-    </foreignObject>
+    </div>
   );
 };
 
