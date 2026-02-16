@@ -121,7 +121,7 @@ export const TeamDashboard = ({
                     >
                       <div className="animate-in fade-in zoom-in-95 duration-200 origin-bottom">
                         <div className="bg-white p-1 rounded-xl shadow-2xl border-2 border-primary/20 flex gap-1 whitespace-nowrap min-w-[160px] lg:min-w-[220px] justify-center backdrop-blur-md bg-white/95">
-                          {moveOptions.map((opt) => (
+                          {moveOptions.filter(opt => opt.steps > 0).map((opt) => (
                             <button
                               key={opt.label}
                               onPointerDown={(e) => e.stopPropagation()}
